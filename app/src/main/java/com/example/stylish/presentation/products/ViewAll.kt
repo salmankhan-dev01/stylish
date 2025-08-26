@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.screen
+package com.example.stylish.presentation.products
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.domain.model.Product
-import com.example.stylish.presentation.navigation.Routes
+import com.example.stylish.navigation.Routes
 import com.example.stylish.util.Result
 import java.math.BigDecimal
 import java.math.RoundingMode

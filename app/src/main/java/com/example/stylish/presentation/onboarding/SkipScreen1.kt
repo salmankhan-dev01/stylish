@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.onboarding
+package com.example.stylish.presentation.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,8 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.R
-import com.example.stylish.presentation.navigation.Routes
-import okhttp3.Route
+import com.example.stylish.navigation.Routes
 
 
 @Composable

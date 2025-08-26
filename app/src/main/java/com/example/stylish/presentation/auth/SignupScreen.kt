@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.auth
+package com.example.stylish.presentation.auth
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,17 +35,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.example.stylish.R
 import com.example.stylish.util.Result
-import com.example.stylish.presentation.navigation.Routes
-import com.example.stylish.presentation.viewmodel.authViewModel.AuthViewModel
+import com.example.stylish.navigation.Routes
+import com.example.stylish.presentation.auth.AuthViewModel
 import kotlin.collections.forEach
 import kotlin.text.isNotEmpty
 

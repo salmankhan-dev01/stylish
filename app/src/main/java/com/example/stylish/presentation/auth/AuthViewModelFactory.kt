@@ -1,10 +1,9 @@
-package com.example.stylish.presentation.viewmodel.authViewModel
+package com.example.stylish.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.stylish.domain.usecase.LoginUseCase
 import com.example.stylish.domain.usecase.SignUpUseCase
-import kotlin.jvm.java
 
 class AuthViewModelFactory(
     private val loginUseCase: LoginUseCase,
@@ -18,6 +17,3 @@ class AuthViewModelFactory(
         throw kotlin.IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
-
-

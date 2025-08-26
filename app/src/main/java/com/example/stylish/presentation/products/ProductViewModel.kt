@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.screen
+package com.example.stylish.presentation.products
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.navigation
+package com.example.stylish.navigation
 
 import kotlinx.serialization.Serializable
 

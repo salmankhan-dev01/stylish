@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.onboarding
+package com.example.stylish.presentation.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,17 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.R
-import com.example.stylish.presentation.navigation.Routes
-
+import com.example.stylish.navigation.Routes
 
 @Composable
-fun SkipScreen2(navHostController: NavHostController) {
+fun SkipScreen3(navHostController: NavHostController) {
     Scaffold(
         topBar = {
-            Top2(navHostController)
+            Top3(navHostController)
         },
         bottomBar = {
-            Down2(navHostController)
+            Down3(navHostController)
         }
     ) {
         Surface(
@@ -49,35 +48,35 @@ fun SkipScreen2(navHostController: NavHostController) {
             ) {
                 Spacer(Modifier.height(90.dp))
                 Image(
-                    painter = painterResource(id = R.drawable.skipimage2),
+                    painter = painterResource(id = R.drawable.skipimage3),
                     contentDescription = null,
                     modifier = Modifier.size(340.dp)
                 )
                 Spacer(Modifier.height(1.dp))
 
                 Text(
-                    "Make Payment",
+                    "Get Your Order",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.Black
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Your money is in good hands",
+                    "Your order is ready!",
                     fontSize = 20.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "Pay quickly and safely",
+                    "Quick and easy pickup.",
                     fontSize = 20.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "Just one tap to finish",
+                    "Tap to get it now",
                     fontSize = 20.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
@@ -90,7 +89,7 @@ fun SkipScreen2(navHostController: NavHostController) {
 }
 
 @Composable
-fun Top2(navHostController: NavHostController) {
+fun Top3(navHostController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,11 +98,12 @@ fun Top2(navHostController: NavHostController) {
 
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("2", fontSize = 30.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+            Text("3", fontSize = 30.sp, color = Color.Black, fontWeight = FontWeight.Bold)
             Text("/3", fontSize = 30.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(240.dp))
             Text(
-                "Skip", fontSize = 30.sp, color = Color.Black, fontWeight = FontWeight.Bold,
+                "Skip", fontSize = 30.sp, color = Color.Black,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
                     navHostController.navigate(
                         Routes.LoginScreen
@@ -121,7 +121,7 @@ fun Top2(navHostController: NavHostController) {
 }
 
 @Composable
-fun Down2(navHostController: NavHostController) {
+fun Down3(navHostController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,15 +138,15 @@ fun Down2(navHostController: NavHostController) {
                 color = Color.Red,
                 modifier = Modifier.clickable {
                     navHostController.navigate(
-                        Routes.SkipScreen3
+                        Routes.LoginScreen
                     )
                 })
         }
     }
 }
-//
+
 //@Preview(showBackground = true)
 //@Composable
-//fun SkipPreview2(){
-//    SkipScreen2()
+//fun SkipPreview3(){
+//    SkipScreen3()
 //}

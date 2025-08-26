@@ -1,7 +1,6 @@
-package com.example.stylish.presentation.navigation
+package com.example.stylish.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -22,20 +21,20 @@ import com.example.stylish.domain.usecase.LoginUseCase
 import com.example.stylish.domain.usecase.SetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.SignUpUseCase
 import com.example.stylish.presentation.userPreference.UserPreferencesViewModel
-import com.example.stylish.presentation.view.auth.ForgotScreen
-import com.example.stylish.presentation.view.auth.LoginScreen
-import com.example.stylish.presentation.view.auth.SignupScreen
-import com.example.stylish.presentation.view.onboarding.SkipScreen1
-import com.example.stylish.presentation.view.onboarding.SkipScreen2
-import com.example.stylish.presentation.view.onboarding.SkipScreen3
-import com.example.stylish.presentation.view.screen.HomeScreen
-import com.example.stylish.presentation.view.screen.ProductDetailScreen
-import com.example.stylish.presentation.view.screen.ProductScreen
-import com.example.stylish.presentation.view.screen.ProductViewModel
-import com.example.stylish.presentation.view.screen.ViewAll
-import com.example.stylish.presentation.view.splash.SplashScreen
-import com.example.stylish.presentation.viewmodel.authViewModel.AuthViewModel
-import com.example.stylish.presentation.viewmodel.authViewModel.AuthViewModelFactory
+import com.example.stylish.presentation.auth.ForgotScreen
+import com.example.stylish.presentation.auth.LoginScreen
+import com.example.stylish.presentation.auth.SignupScreen
+import com.example.stylish.presentation.onboarding.SkipScreen1
+import com.example.stylish.presentation.onboarding.SkipScreen2
+import com.example.stylish.presentation.onboarding.SkipScreen3
+import com.example.stylish.presentation.products.HomeScreen
+import com.example.stylish.presentation.products.ProductDetailScreen
+import com.example.stylish.presentation.products.ProductScreen
+import com.example.stylish.presentation.products.ProductViewModel
+import com.example.stylish.presentation.products.ViewAll
+import com.example.stylish.presentation.splash.SplashScreen
+import com.example.stylish.presentation.auth.AuthViewModel
+import com.example.stylish.presentation.auth.AuthViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable

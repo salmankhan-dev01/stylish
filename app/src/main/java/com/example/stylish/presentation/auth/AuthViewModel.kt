@@ -1,14 +1,13 @@
-package com.example.stylish.presentation.viewmodel.authViewModel
+package com.example.stylish.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.stylish.util.Result
 import com.example.stylish.domain.usecase.LoginUseCase
 import com.example.stylish.domain.usecase.SignUpUseCase
+import com.example.stylish.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlin.text.isBlank
 
 class AuthViewModel(
     private val loginUseCase: LoginUseCase,

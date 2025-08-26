@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.onboarding
+package com.example.stylish.presentation.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -20,21 +20,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.R
-import com.example.stylish.presentation.navigation.Routes
+import com.example.stylish.navigation.Routes
+
 
 @Composable
-fun SkipScreen3(navHostController: NavHostController) {
+fun SkipScreen2(navHostController: NavHostController) {
     Scaffold(
         topBar = {
-            Top3(navHostController)
+            Top2(navHostController)
         },
         bottomBar = {
-            Down3(navHostController)
+            Down2(navHostController)
         }
     ) {
         Surface(
@@ -49,35 +49,35 @@ fun SkipScreen3(navHostController: NavHostController) {
             ) {
                 Spacer(Modifier.height(90.dp))
                 Image(
-                    painter = painterResource(id = R.drawable.skipimage3),
+                    painter = painterResource(id = R.drawable.skipimage2),
                     contentDescription = null,
                     modifier = Modifier.size(340.dp)
                 )
                 Spacer(Modifier.height(1.dp))
 
                 Text(
-                    "Get Your Order",
+                    "Make Payment",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.Black
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Your order is ready!",
+                    "Your money is in good hands",
                     fontSize = 20.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "Quick and easy pickup.",
+                    "Pay quickly and safely",
                     fontSize = 20.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "Tap to get it now",
+                    "Just one tap to finish",
                     fontSize = 20.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
@@ -90,7 +90,7 @@ fun SkipScreen3(navHostController: NavHostController) {
 }
 
 @Composable
-fun Top3(navHostController: NavHostController) {
+fun Top2(navHostController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,12 +99,11 @@ fun Top3(navHostController: NavHostController) {
 
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("3", fontSize = 30.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+            Text("2", fontSize = 30.sp, color = Color.Black, fontWeight = FontWeight.Bold)
             Text("/3", fontSize = 30.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(240.dp))
             Text(
-                "Skip", fontSize = 30.sp, color = Color.Black,
-                fontWeight = FontWeight.Bold,
+                "Skip", fontSize = 30.sp, color = Color.Black, fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
                     navHostController.navigate(
                         Routes.LoginScreen
@@ -122,7 +121,7 @@ fun Top3(navHostController: NavHostController) {
 }
 
 @Composable
-fun Down3(navHostController: NavHostController) {
+fun Down2(navHostController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,15 +138,15 @@ fun Down3(navHostController: NavHostController) {
                 color = Color.Red,
                 modifier = Modifier.clickable {
                     navHostController.navigate(
-                        Routes.LoginScreen
+                        Routes.SkipScreen3
                     )
                 })
         }
     }
 }
-
+//
 //@Preview(showBackground = true)
 //@Composable
-//fun SkipPreview3(){
-//    SkipScreen3()
+//fun SkipPreview2(){
+//    SkipScreen2()
 //}

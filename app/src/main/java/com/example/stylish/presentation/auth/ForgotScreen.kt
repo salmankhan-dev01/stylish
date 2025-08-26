@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.auth
+package com.example.stylish.presentation.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.R
-import com.example.stylish.presentation.navigation.Routes
+import com.example.stylish.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.screen
+package com.example.stylish.presentation.products
 
 import android.content.Context
 import android.content.Intent
@@ -21,9 +21,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -67,14 +65,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.stylish.domain.model.Product
-import com.example.stylish.presentation.navigation.Routes
+import com.example.stylish.navigation.Routes
 import com.example.stylish.util.Result
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.div
-import kotlin.text.category
-import kotlin.text.toInt
-import kotlin.times
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -549,6 +543,7 @@ fun AddToCartSection(
 }
 
 // share function of product
+
 fun shareProduct(product: Product,context: Context){
     val shareText="Check out this amazing product: ${product.title} \n\n" +
             "${product.description}\n\n" +
@@ -556,8 +551,8 @@ fun shareProduct(product: Product,context: Context){
             "Rating: ${String.format("%.1f", product.rating)} stars\n\n" +
             "Get it now on Stylish!"
     val shareIntent= Intent().apply {
-        action=Intent.ACTION_SEND
-        type="text/plain"
+        action =Intent.ACTION_SEND
+        type ="text/plain"
         putExtra(Intent.EXTRA_TEXT,shareText)
         putExtra(Intent.EXTRA_SUBJECT,"Check out ${product.title}")
     }

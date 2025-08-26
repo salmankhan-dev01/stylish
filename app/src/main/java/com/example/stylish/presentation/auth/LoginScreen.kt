@@ -1,4 +1,4 @@
-package com.example.stylish.presentation.view.auth
+package com.example.stylish.presentation.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.R
-import com.example.stylish.presentation.viewmodel.authViewModel.AuthViewModel
+import com.example.stylish.presentation.auth.AuthViewModel
 import com.example.stylish.util.Result
-import com.example.stylish.presentation.navigation.Routes
+import com.example.stylish.navigation.Routes
 import com.example.stylish.presentation.userPreference.UserPreferencesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

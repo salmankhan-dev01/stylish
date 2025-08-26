@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1063098308611",
+    "project_id": "stylish-e79a5",
+    "storage_bucket": "stylish-e79a5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1063098308611:android:f5a62728881f3db2401636",
+        "android_client_info": {
+          "package_name": "com.example.stylish"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw32f93wY2Hpn5bDRlwiPTjoVSMrVJKaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

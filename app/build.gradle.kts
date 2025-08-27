@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.coil.compose)
     implementation("io.ktor:ktor-client-android:2.3.5") // ✅ Android engine
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.1")
+
 
 
 }

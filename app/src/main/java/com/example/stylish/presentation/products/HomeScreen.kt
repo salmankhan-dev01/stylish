@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.R
 import com.example.stylish.navigation.Routes
+import com.example.stylish.presentation.profile.ProfileViewModel
 
 
 @Composable
@@ -54,9 +55,10 @@ fun HomeScreen(navHostController: NavHostController){
             Box(
                 modifier = Modifier
                     .fillMaxWidth().clickable {
-                        navHostController.navigate(Routes.ProductScreen) {
-                            popUpTo(Routes.HomeScreen) { inclusive=true }
-                        }
+//                        navHostController.navigate(Routes.ProductScreen) {
+//                            popUpTo(Routes.HomeScreen) { inclusive=true }
+//                        }
+                        navHostController.navigate(Routes.UserProfile)
                     }
                     .height(55.dp)
                     .padding(horizontal = 35.dp)

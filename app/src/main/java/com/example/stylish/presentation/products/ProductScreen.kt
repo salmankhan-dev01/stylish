@@ -1,6 +1,7 @@
 package com.example.stylish.presentation.products
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -79,6 +80,7 @@ import com.example.stylish.R
 import com.example.stylish.domain.model.Product
 import com.example.stylish.navigation.Routes
 import com.example.stylish.util.Result
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -92,7 +94,10 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
 
     val productState by productViewModel.productState.collectAsState()//tracking flow
     var searchQuery by remember { mutableStateOf("") }
-
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+    val username = firebaseUser?.displayName ?: "No Name"
+    val email = firebaseUser?.email ?: "No Email"
+    Log.d("username",username+"___"+email)
     //----------Category(Image and Text)----------
     val imageList = listOf(
         R.drawable.one,

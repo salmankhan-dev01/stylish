@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "2.2.0"
+    kotlin("plugin.serialization") version "1.9.10"
+    kotlin("kapt") // Room ke liye ye chahiye
     alias(libs.plugins.google.gms.google.services)
 }
 
@@ -72,6 +73,16 @@ dependencies {
     implementation(libs.coil.compose)
     implementation("io.ktor:ktor-client-android:2.3.5") // ✅ Android engine
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.1")
+
+    // Room
+    // Room
+    implementation("androidx.room:room-runtime:2.7.0-alpha04")
+    kapt("androidx.room:room-compiler:2.7.0-alpha04")
+    implementation("androidx.room:room-ktx:2.7.0-alpha04")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.6.0")
+
+
 
 
 

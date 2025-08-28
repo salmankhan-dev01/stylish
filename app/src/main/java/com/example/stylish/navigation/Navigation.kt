@@ -10,16 +10,24 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.stylish.data.local.AppDatabaseProvider
 import com.example.stylish.data.local.UserPreferencesDataStore
+import com.example.stylish.data.remote.FirebaseService
 import com.example.stylish.data.remote.NetworkModule
+import com.example.stylish.data.repository.AddressAccountRepositoryImpl
 import com.example.stylish.data.repository.AuthRepositoryImpl
 import com.example.stylish.data.repository.ProductRepositoryImpl
 import com.example.stylish.data.repository.ProfileAndAddressUpdateRepositoryImpl
 import com.example.stylish.data.repository.UserPreferencesRepositoryImpl
+import com.example.stylish.domain.usecase.AddAddressUseCase
+import com.example.stylish.domain.usecase.AddBankAccountUseCase
+import com.example.stylish.domain.usecase.GetAddressUseCase
+import com.example.stylish.domain.usecase.GetBankAccountUseCase
 import com.example.stylish.domain.usecase.GetProductsUseCase
 import com.example.stylish.domain.usecase.GetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.GetUsernameUsecase
 import com.example.stylish.domain.usecase.LoginUseCase
+import com.example.stylish.domain.usecase.LogoutUseCase
 import com.example.stylish.domain.usecase.ProfileAndAddressUsecase
 import com.example.stylish.domain.usecase.SetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.SignUpUseCase
@@ -38,6 +46,7 @@ import com.example.stylish.presentation.products.ViewAll
 import com.example.stylish.presentation.splash.SplashScreen
 import com.example.stylish.presentation.auth.AuthViewModel
 import com.example.stylish.presentation.auth.AuthViewModelFactory
+import com.example.stylish.presentation.profile.AddressAccountViewModel
 import com.example.stylish.presentation.profile.ProfileViewModel
 import com.example.stylish.presentation.profile.UserProfile
 import com.google.firebase.auth.FirebaseAuth
@@ -78,7 +87,26 @@ fun Navigation(){
     val profileAndAddressUsecase=remember { ProfileAndAddressUsecase(profileAndAddressUpdateRepositoryImpl) }
     val profileViewModel=remember { ProfileViewModel(getUsernameUsecase,profileAndAddressUsecase) }
 
+// ------------------------- profile me user address and account room+firebase ----------------------------
+    // 1️⃣ Room / Dao instances
+    val db = remember { AppDatabaseProvider.getDatabase(context) }
+    val addressDao = remember { db.addressDao() }
+    val bankAccountDao = remember { db.bankAccountDao() }
 
+    // 2️⃣ Firebase Service
+    val firebaseService = remember { FirebaseService(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance()) }
+
+    // 3️⃣ Repository
+    val repository = remember { AddressAccountRepositoryImpl(addressDao, bankAccountDao, firebaseService) }
+
+    // 4️⃣ UseCases
+    val addAddressUseCase = remember { AddAddressUseCase(repository) }
+    val getAddressUseCase = remember { GetAddressUseCase(repository) }
+    val addBankAccountUseCase = remember { AddBankAccountUseCase(repository) }
+    val getBankAccountUseCase = remember { GetBankAccountUseCase(repository) }
+    val logoutUseCase = remember { LogoutUseCase(repository) }
+    // 5️⃣ ViewModel
+    val viewModel1 = remember { AddressAccountViewModel(addAddressUseCase, getAddressUseCase, addBankAccountUseCase, getBankAccountUseCase,logoutUseCase) }
 
     NavHost(navController=navController, startDestination = Routes.LoginScreen){
         //NAV GRAPH
@@ -117,7 +145,7 @@ fun Navigation(){
             ProductDetailScreen(navController,productViewModel,args.productId)
         }
         composable<Routes.UserProfile> {
-            UserProfile(profileViewModel)
+            UserProfile(profileViewModel,viewModel1,navController)
         }
     }
 //    LaunchedEffect(userPreferenceState.isLoading,userPreferenceState.isLoggedIn,userPreferenceState.isFirstTimeLogin) {

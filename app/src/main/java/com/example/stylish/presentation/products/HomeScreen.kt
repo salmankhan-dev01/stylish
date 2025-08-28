@@ -26,10 +26,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.stylish.R
 import com.example.stylish.navigation.Routes
-import com.example.stylish.presentation.profile.ProfileViewModel
+import com.example.stylish.ui.theme.Pink
 
 
 @Composable
+
 fun HomeScreen(navHostController: NavHostController){
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -69,7 +70,7 @@ fun HomeScreen(navHostController: NavHostController){
                         spotColor = Color.Black
                     )
                     .background(
-                        color = Color(0xFFEC3455),
+                        color = Pink,
                         shape = RoundedCornerShape(9.dp)
                     )
             )

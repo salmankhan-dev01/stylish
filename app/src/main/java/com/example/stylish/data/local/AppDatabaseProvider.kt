@@ -13,7 +13,9 @@ object AppDatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "stylish_database"
-            ).build()
+            )
+                .fallbackToDestructiveMigration() // 👈 old data delete, new schema create
+                .build()
             INSTANCE = instance
             instance
         }

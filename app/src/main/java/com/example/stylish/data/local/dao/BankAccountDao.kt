@@ -10,7 +10,7 @@ interface BankAccountDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(account: BankAccountEntity)
 
-    @Query("SELECT * FROM bank_account_table LIMIT 1")
+    @Query("SELECT * FROM bank_account_table ORDER BY id DESC LIMIT 1")
     suspend fun getAccount(): BankAccountEntity?
 
     @Query("DELETE FROM bank_account_table")

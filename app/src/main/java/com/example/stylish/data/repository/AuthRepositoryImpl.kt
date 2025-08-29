@@ -2,6 +2,9 @@ package com.example.stylish.data.repository
 
 
 import android.util.Log
+import com.example.stylish.data.local.dao.UserDao
+import com.example.stylish.data.local.entity.UserEntity
+import com.example.stylish.data.remote.FirebaseService
 import com.example.stylish.domain.model.User
 import com.example.stylish.domain.repository.AuthRepository
 import com.example.stylish.util.Result
@@ -12,7 +15,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 
 
-class AuthRepositoryImpl(private val firebaseAuth: FirebaseAuth,private  val firestore: FirebaseFirestore): AuthRepository {
+class AuthRepositoryImpl(
+    private val firebaseAuth: FirebaseAuth,
+    private val firestore: FirebaseFirestore,
+    private  val firebaseService: FirebaseService,
+    private val userDao: UserDao
+): AuthRepository {
     override suspend fun login(email: String, password: String): Result<String> {
         return try {
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
@@ -39,20 +47,26 @@ class AuthRepositoryImpl(private val firebaseAuth: FirebaseAuth,private  val fir
                 .setDisplayName(email.substringBefore("@"))
                 .build()
             authUser.updateProfile(profileUpdates).await()
-            //Firestore me User object save
-            val user = User(
-                username = email.substringBefore("@"),  // default username = email
-                email = email,
-                password=password
+//            //Firestore me User object save
+//            val user = User(
+//                username = email.substringBefore("@"),  // default username = email
+//                email = email,
+//                password=password
+//            )
+            val user= UserEntity(
+                name = email.substringBefore("@"),
+                email = email
             )
-            firestore.collection("users")
-                .document(authUser.uid)
-                .set(user)
-                .await()
-                    delay(1000)
-                    Result.Success("Signup Successful")
-                } catch (e: Exception) {
-                    Result.Failure(e.localizedMessage ?: "Unknown error during signup")
-                }
+            firebaseService.saveUser(user)
+            userDao.insert(user)
+//            firestore.collection("users")
+//                .document(authUser.uid)
+//                .set(user)
+//                .await()
+            delay(1000)
+            Result.Success("Signup Successful")
+        } catch (e: Exception) {
+            Result.Failure(e.localizedMessage ?: "Unknown error during signup")
+        }
     }
 }

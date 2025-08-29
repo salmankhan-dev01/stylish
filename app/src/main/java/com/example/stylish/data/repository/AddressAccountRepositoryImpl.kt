@@ -3,15 +3,18 @@ package com.example.stylish.data.repository
 
 
 import android.util.Log
+import com.example.stylish.data.local.dao.UserDao
 import com.example.stylish.data.local.dto.AddressDao
 import com.example.stylish.data.local.dto.BankAccountDao
 import com.example.stylish.data.local.entity.AddressEntity
 import com.example.stylish.data.local.entity.BankAccountEntity
+import com.example.stylish.data.local.entity.UserEntity
 import com.example.stylish.data.remote.FirebaseService
 import com.example.stylish.domain.repository.AddressAccountRepository
 import com.example.stylish.util.Result
 
 class AddressAccountRepositoryImpl(
+    private val userDao: UserDao,
     private val addressDao: AddressDao,
     private val bankAccountDao: BankAccountDao,
     private val firebaseService: FirebaseService
@@ -19,8 +22,8 @@ class AddressAccountRepositoryImpl(
 
     override suspend fun addAddress(address: AddressEntity): Result<String> {
         return try {
-            addressDao.insert(address)
             firebaseService.saveAddress(address)
+            addressDao.insert(address)
             Result.Success("Address saved successfully")
         } catch (e: Exception) {
             Result.Failure(e.message ?: "Failed to save address")
@@ -48,8 +51,8 @@ class AddressAccountRepositoryImpl(
 
     override suspend fun addBankAccount(account: BankAccountEntity): Result<String> {
         return try {
-            bankAccountDao.insert(account)
             firebaseService.saveBankAccount(account)
+            bankAccountDao.insert(account)
             Result.Success("Bank account saved successfully")
         } catch (e: Exception) {
             Result.Failure(e.message ?: "Failed to save bank account")
@@ -73,6 +76,33 @@ class AddressAccountRepositoryImpl(
             }
         } catch (e: Exception) {
             Result.Failure(e.message ?: "Failed to fetch bank account")
+        }
+    }
+
+    override suspend fun addUser(user: UserEntity): Result<String> {
+        return try {
+            firebaseService.saveUser(user)
+            userDao.insert(user)
+            Result.Success("User added successfully")
+        }catch (e: Exception){
+            Result.Failure(e.message?:"User added failed")
+        }
+
+    }
+
+    override suspend fun getUser(): Result<UserEntity> {
+        return try {
+            val local=userDao.getLatestUser()
+            if(local!=null) return Result.Success(local)
+            val remote=firebaseService.getUser()
+            if (remote!=null){
+                userDao.insert(remote)
+                Result.Success(remote)
+            }else{
+                Result.Failure("No user found")
+            }
+        }catch (e: Exception){
+            Result.Failure(e.message?:"No user found")
         }
     }
 

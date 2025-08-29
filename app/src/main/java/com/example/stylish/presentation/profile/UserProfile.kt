@@ -1,5 +1,6 @@
 package com.example.stylish.presentation.profile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import com.example.stylish.util.Result
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +45,7 @@ import androidx.navigation.NavHostController
 import com.example.stylish.R
 import com.example.stylish.data.local.entity.AddressEntity
 import com.example.stylish.data.local.entity.BankAccountEntity
+import com.example.stylish.data.local.entity.UserEntity
 import com.example.stylish.navigation.Routes
 import com.example.stylish.ui.theme.Pink
 
@@ -53,30 +55,17 @@ fun UserProfile(
     viewModel: AddressAccountViewModel,
     navController: NavHostController
 ) {
-    val userFromDB by profileViewModel.user.collectAsState() // observe StateFlow
-    val username = remember { mutableStateOf(userFromDB.username) }
     val scrollState = rememberScrollState()
 
-    var addressModel by remember {
-        mutableStateOf(
-            AddressEntity(pinCode = "", address = "", city = "", state = "", country = "")
-        )
-    }
+    var addressModel by remember { mutableStateOf(AddressEntity(pinCode = "", address = "", city = "", state = "", country = "")) }
 
     // ---------------- Bank State ----------------
-    var bankModel by remember {
-        mutableStateOf(
-            BankAccountEntity(accountNumber = "", accountHolder = "", ifscCode = "")
-        )
-    }
+    var bankModel by remember { mutableStateOf(BankAccountEntity(accountNumber = "", accountHolder = "", ifscCode = "")) }
+    // User state
+    var savedUser by remember { mutableStateOf(UserEntity(name = "", email = "")) }
+    var editableName by  remember { mutableStateOf(savedUser.name )}
 
 
-    LaunchedEffect(Unit) {
-        profileViewModel.fetchUsername()
-    }
-    LaunchedEffect(userFromDB) {
-        username.value = userFromDB.username
-    }
 
 
     // ---------------- Observe ViewModel ----------------
@@ -85,12 +74,14 @@ fun UserProfile(
     val saveAddressResult by viewModel.saveAddressResult.collectAsState()
     val saveBankResult by viewModel.saveBankResult.collectAsState()
     val logoutState by viewModel.logout.collectAsState()
-
+    val userResult by viewModel.userResult.collectAsState()
+    val saveUser by viewModel.saveUserResult.collectAsState()
 
     // ---------------- Fetch on screen open ----------------
     LaunchedEffect(Unit) {
         viewModel.fetchAddress()
         viewModel.fetchBankAccount()
+        viewModel.fetchUser()
     }
 
     // ---------------- Update UI when data arrives ----------------
@@ -105,6 +96,14 @@ fun UserProfile(
             bankModel = (bankResult as Result.Success<BankAccountEntity>).data
         }
     }
+
+    LaunchedEffect(userResult) {
+        if (userResult is Result.Success) {
+            savedUser=(userResult as Result.Success<UserEntity>).data
+            editableName=savedUser.name
+        }
+    }
+
     // Observe logout
     LaunchedEffect(logoutState) {
         when (logoutState) {
@@ -177,9 +176,13 @@ fun UserProfile(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                if (userFromDB.username.isEmpty()) {
-                    CircularProgressIndicator()
+                when (userResult) {
+                    is Result.Loading -> CircularProgressIndicator()
+                    is Result.Success -> {} // already handled
+                    is Result.Failure -> Text("Failed to load user")
+                    else -> {}
                 }
+
             }
             Spacer(modifier = Modifier.height(40.dp))
             Text(
@@ -191,26 +194,25 @@ fun UserProfile(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Username : " + userFromDB.username,
+                text = "Username : " + savedUser.name,
                 fontSize = 20.sp,
                 color = Color.Black
             )
             Spacer(modifier = Modifier.height(10.dp))
             Row() {
                 OutlinedTextField(
-                    value = username.value,   // yaha aap apna state use karoge
+                    value = editableName,   // yaha aap apna state use karoge
                     modifier = Modifier
                         .width(200.dp)
                         .height(56.dp),
-                    onValueChange = { username.value = it },
+                    onValueChange = { editableName=it },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Button(
                     onClick = {
-                        if (username.value != userFromDB.username) {
-                            profileViewModel.updateUsername(username.value)
-                        }
+                        val updatedUser = savedUser.copy(name = editableName)
+                        viewModel.saveUser(updatedUser)
                     },
                     modifier = Modifier
                         .height(56.dp)          // same height as textfield
@@ -232,7 +234,7 @@ fun UserProfile(
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
-                value = userFromDB.email,
+                value =savedUser.email,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 enabled = false,   // Disabled field
@@ -246,7 +248,7 @@ fun UserProfile(
             Spacer(modifier = Modifier.height(10.dp))
 
             OutlinedTextField(
-                value = userFromDB.password,
+                value = "********",
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 enabled = false,   // Disabled field
@@ -352,7 +354,11 @@ fun UserProfile(
             when (saveAddressResult) {
                 is Result.Loading -> Text("Saving address...")
                 is Result.Success -> Text((saveAddressResult as Result.Success<String>).data)
-                is Result.Failure -> Text("Error: ${(saveAddressResult as Result.Failure).message}")
+                is Result.Failure -> {
+                    val txt="${(saveAddressResult as Result.Failure).message}"
+                    Log.d("address1",txt)
+                    Text("Error: ${(saveAddressResult as Result.Failure).message}")
+                }
                 else -> {}
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -448,9 +454,3 @@ fun UserProfile(
     }
 }
 
-@Composable
-fun AddressSection() {
-
-
-
-}

@@ -21,10 +21,12 @@ import com.example.stylish.data.repository.ProfileAndAddressUpdateRepositoryImpl
 import com.example.stylish.data.repository.UserPreferencesRepositoryImpl
 import com.example.stylish.domain.usecase.AddAddressUseCase
 import com.example.stylish.domain.usecase.AddBankAccountUseCase
+import com.example.stylish.domain.usecase.AddUserUseCase
 import com.example.stylish.domain.usecase.GetAddressUseCase
 import com.example.stylish.domain.usecase.GetBankAccountUseCase
 import com.example.stylish.domain.usecase.GetProductsUseCase
 import com.example.stylish.domain.usecase.GetUserPreferencesUseCase
+import com.example.stylish.domain.usecase.GetUserUseCase
 import com.example.stylish.domain.usecase.GetUsernameUsecase
 import com.example.stylish.domain.usecase.LoginUseCase
 import com.example.stylish.domain.usecase.LogoutUseCase
@@ -58,13 +60,7 @@ fun Navigation(){
     val navController= rememberNavController()
     val context= LocalContext.current
 
-    //For login and signup
-    val authRepository = AuthRepositoryImpl(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance())
-    val loginUseCase = LoginUseCase(authRepository)
-    val signUpUseCase = SignUpUseCase(authRepository)
-    val factory = AuthViewModelFactory(loginUseCase, signUpUseCase)
-    // Get ViewModel with factory
-    val viewModel: AuthViewModel = viewModel(factory = factory)
+
 
     //for fetch product form api
     val productPepo= remember{ ProductRepositoryImpl(NetworkModule.productApiService) }
@@ -92,23 +88,36 @@ fun Navigation(){
     val db = remember { AppDatabaseProvider.getDatabase(context) }
     val addressDao = remember { db.addressDao() }
     val bankAccountDao = remember { db.bankAccountDao() }
+    val userDao=remember { db.userDao() }
 
     // 2️⃣ Firebase Service
     val firebaseService = remember { FirebaseService(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance()) }
 
     // 3️⃣ Repository
-    val repository = remember { AddressAccountRepositoryImpl(addressDao, bankAccountDao, firebaseService) }
+    val repository = remember { AddressAccountRepositoryImpl(userDao,addressDao, bankAccountDao, firebaseService) }
 
     // 4️⃣ UseCases
     val addAddressUseCase = remember { AddAddressUseCase(repository) }
     val getAddressUseCase = remember { GetAddressUseCase(repository) }
     val addBankAccountUseCase = remember { AddBankAccountUseCase(repository) }
     val getBankAccountUseCase = remember { GetBankAccountUseCase(repository) }
+    val addUserUseCase=remember { AddUserUseCase(repository) }
+    val getUserUseCase=remember { GetUserUseCase(repository) }
     val logoutUseCase = remember { LogoutUseCase(repository) }
     // 5️⃣ ViewModel
-    val viewModel1 = remember { AddressAccountViewModel(addAddressUseCase, getAddressUseCase, addBankAccountUseCase, getBankAccountUseCase,logoutUseCase) }
+    val viewModel1 = remember { AddressAccountViewModel(addAddressUseCase, getAddressUseCase, addBankAccountUseCase, getBankAccountUseCase,addUserUseCase,getUserUseCase,logoutUseCase) }
 
-    NavHost(navController=navController, startDestination = Routes.LoginScreen){
+
+
+    //For login and signup
+    val authRepository = AuthRepositoryImpl(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(),firebaseService,userDao)
+    val loginUseCase = LoginUseCase(authRepository)
+    val signUpUseCase = SignUpUseCase(authRepository)
+    val factory = AuthViewModelFactory(loginUseCase, signUpUseCase)
+    // Get ViewModel with factory
+    val viewModel: AuthViewModel = viewModel(factory = factory)
+
+    NavHost(navController=navController, startDestination = Routes.SignupScreen){
         //NAV GRAPH
         composable<Routes.SplashScreen> {
             SplashScreen()

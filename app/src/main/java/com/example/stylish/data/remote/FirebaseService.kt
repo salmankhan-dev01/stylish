@@ -4,8 +4,10 @@ package com.example.stylish.data.remote
 import android.util.Log
 import com.example.stylish.data.local.entity.AddressEntity
 import com.example.stylish.data.local.entity.BankAccountEntity
+import com.example.stylish.data.local.entity.UserEntity
 import com.example.stylish.data.remote.dto.AddressDto
 import com.example.stylish.data.remote.dto.BankAccountDto
+import com.example.stylish.data.remote.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -77,6 +79,33 @@ class FirebaseService(
             )
         }catch (e: Exception) {
 
+            return null
+        }
+    }
+
+    suspend fun saveUser(user: UserEntity){
+        val dto= UserDto(
+            name =user.name,
+            email = user.email
+        )
+        db.collection("users").document(uid)
+            .collection("user_details").document("primary")
+            .set(dto).await()
+    }
+
+    suspend fun getUser(): UserEntity?{
+        return try {
+            val doc= db.collection("users").document(uid)
+                .collection("user_details").document("primary")
+                .get().await()
+            val dto=doc.toObject(UserDto::class.java)?: return  null
+            UserEntity(
+                id = 0,
+                name = dto.name,
+                email = dto.email,
+
+            )
+        }catch (e: Exception){
             return null
         }
     }

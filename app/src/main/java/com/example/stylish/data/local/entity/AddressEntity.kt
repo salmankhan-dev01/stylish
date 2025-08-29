@@ -8,12 +8,11 @@ import com.google.firebase.firestore.Exclude
 @Entity(tableName = "address_table")
 data class AddressEntity(
     @PrimaryKey(autoGenerate = true)
-
     val id: Int = 0,  // Room ke liye
-
     val pinCode: String,
     val address: String,
     val city: String,
     val state: String,
-    val country: String
+    val country: String,
+    val syncPending: Boolean=false
 )

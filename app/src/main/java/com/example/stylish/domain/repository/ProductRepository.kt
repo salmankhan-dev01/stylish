@@ -5,4 +5,5 @@ import com.example.stylish.util.Result
 
 interface ProductRepository {
     suspend fun getProducts(): Result<List<Product>>
+
 }

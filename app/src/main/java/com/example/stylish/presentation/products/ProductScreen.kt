@@ -89,7 +89,7 @@ import java.math.RoundingMode
 //@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductScreen(navController: NavHostController, productViewModel: ProductViewModel){
+fun ProductScreen(navController: NavHostController, productViewModel: ProductViewModel) {
 
 
     val productState by productViewModel.productState.collectAsState()//tracking flow
@@ -97,7 +97,7 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
     val firebaseUser = FirebaseAuth.getInstance().currentUser
     val username = firebaseUser?.displayName ?: "No Name"
     val email = firebaseUser?.email ?: "No Email"
-    Log.d("username",username+"___"+email)
+    Log.d("username", username + "___" + email)
     //----------Category(Image and Text)----------
     val imageList = listOf(
         R.drawable.one,
@@ -109,23 +109,52 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
     val nameList = listOf("Beauty", "Fashion", "kids", "Mens", "Woman")
 
 
-
     //----------USER INTERFACE------------------
-    Scaffold(topBar = { Top() }, bottomBar = { BottomBar(navController, Routes.ProductScreen) },modifier = Modifier.fillMaxSize()){
-        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF1F1F1)){
+    Scaffold(
+        topBar = { Top(navController) },
+        bottomBar = { BottomBar(navController, Routes.ProductScreen) },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF1F1F1)) {
 
             //BOX BECAUSE WE HAVE TO SHOW LOADING IN MIDDLE
-            Box(modifier = Modifier.fillMaxSize()){
+            Box(modifier = Modifier.fillMaxSize()) {
 
                 //-----------COLUMN ONE ----------------
-                Column(modifier = Modifier.fillMaxSize().padding(it).verticalScroll(rememberScrollState())){
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it)
+                        .verticalScroll(rememberScrollState())
+                ) {
                     Spacer(Modifier.height(20.dp))
 
                     //----SEARCH BOX----------------
-                    OutlinedTextField(value = searchQuery, onValueChange = {searchQuery=it},
-                        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null, modifier = Modifier.size(30.dp), tint = Color(0xFFBBBBBB)) },
-                        placeholder = { Text("Search any Product", fontSize = 14.sp, color = Color(0xFFBBBBBB)) },
-                        trailingIcon ={ Icon(imageVector = Icons.Default.Mic, contentDescription = null, modifier = Modifier.size(30.dp), tint = Color(0xFFBBBBBB)) },
+                    OutlinedTextField(
+                        value = searchQuery, onValueChange = { searchQuery = it },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                modifier = Modifier.size(30.dp),
+                                tint = Color(0xFFBBBBBB)
+                            )
+                        },
+                        placeholder = {
+                            Text(
+                                "Search any Product",
+                                fontSize = 14.sp,
+                                color = Color(0xFFBBBBBB)
+                            )
+                        },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = null,
+                                modifier = Modifier.size(30.dp),
+                                tint = Color(0xFFBBBBBB)
+                            )
+                        },
                         shape = RoundedCornerShape(10.dp),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = Color.White,
@@ -135,7 +164,8 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp).padding(horizontal = 15.dp)
+                            .height(56.dp)
+                            .padding(horizontal = 15.dp)
                             .shadow(
                                 elevation = 4.dp,
                                 shape = RoundedCornerShape(10.dp),
@@ -153,18 +183,21 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                             .fillMaxWidth()
                             .padding(start = 20.dp, end = 20.dp)
                     ) {
-                        when(val state=productState){
-                            is Result.Success ->{
-                                Text(text = "${state.data.size} Items",
+                        when (val state = productState) {
+                            is Result.Success -> {
+                                Text(
+                                    text = "${state.data.size} Items",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold, color = Color.Black
-                                    )
-                            }else -> {
-                            Text(
-                                text = "Loading...",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
+                                )
+                            }
+
+                            else -> {
+                                Text(
+                                    text = "Loading...",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
                             }
                         }
 
@@ -177,10 +210,24 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 .width(70.dp)
                                 .background(Color.White, shape = RoundedCornerShape(10.dp))
                         ) {
-                            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                                Text("Sort", fontSize =15.sp, color = Color.Black, fontWeight = FontWeight.Medium )
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    "Sort",
+                                    fontSize = 15.sp,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Medium
+                                )
                                 Spacer(Modifier.width(5.dp))
-                                Icon(imageVector = Icons.Default.UnfoldMore, contentDescription = null, modifier = Modifier.size(23.dp), tint = Color.Black)
+                                Icon(
+                                    imageVector = Icons.Default.UnfoldMore,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(23.dp),
+                                    tint = Color.Black
+                                )
                             }
                         }
 
@@ -192,15 +239,28 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 .width(70.dp)
                                 .background(Color.White, shape = RoundedCornerShape(10.dp))
                         ) {
-                            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                                Text("Filter", fontSize =15.sp, color = Color.Black, fontWeight = FontWeight.Medium )
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    "Filter",
+                                    fontSize = 15.sp,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Medium
+                                )
                                 Spacer(Modifier.width(5.dp))
-                                Icon(imageVector = Icons.Default.FilterAlt, contentDescription = null, modifier = Modifier.size(23.dp), tint = Color.Black)
+                                Icon(
+                                    imageVector = Icons.Default.FilterAlt,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(23.dp),
+                                    tint = Color.Black
+                                )
                             }
                         }
                     }
                     Spacer(Modifier.height(20.dp))
-
 
 
                     //---------Category(DISPLAY)----------------
@@ -229,8 +289,13 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                     }
 
                     Spacer(Modifier.height(20.dp))
-                    Box(modifier = Modifier.fillMaxWidth().height(260.dp).padding(horizontal = 20.dp)){
-                        Column(modifier = Modifier.fillMaxWidth()){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(260.dp)
+                            .padding(horizontal = 20.dp)
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
                             Image(
                                 painter = painterResource(R.drawable.ads),
                                 contentDescription = null,
@@ -240,11 +305,18 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 contentScale = ContentScale.Crop  // 🟢 Key line to cover the box
                             )
                         }
-                        Column(modifier = Modifier.fillMaxWidth().padding(start = 20.dp)){
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp)) {
                             Spacer(Modifier.height(40.dp))
-                            Text("50-40% OFF", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text(
+                                "50-40% OFF",
+                                fontSize = 25.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
                             Spacer(Modifier.height(7.dp))
-                            Text("Now in (product)", fontSize = 15.sp,  color = Color.White)
+                            Text("Now in (product)", fontSize = 15.sp, color = Color.White)
                             Spacer(Modifier.height(7.dp))
                             Text("All colours", fontSize = 15.sp, color = Color.White)
                             Spacer(Modifier.height(9.dp))
@@ -252,8 +324,15 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 modifier = Modifier
                                     .height(35.dp)
                                     .width(110.dp)
-                                    .background(color = Color.Transparent, shape = RoundedCornerShape(10.dp))
-                                    .border(width = 1.dp, color = Color.White, shape = RoundedCornerShape(8.dp))
+                                    .background(
+                                        color = Color.Transparent,
+                                        shape = RoundedCornerShape(10.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
                                     .padding(horizontal = 8.dp) // spacing inside box
                             ) {
                                 Row(
@@ -278,10 +357,17 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
 
 
                         }
-                        Column(modifier = Modifier.fillMaxWidth()){
+                        Column(modifier = Modifier.fillMaxWidth()) {
                             Spacer(Modifier.height(180.dp))
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                                Image(painter = painterResource(R.drawable.dotthree), contentDescription = null, modifier = Modifier.size(90.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.dotthree),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(90.dp)
+                                )
                             }
                         }
                     }
@@ -306,16 +392,28 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text("Deal of the Day", fontSize = 15.sp, color = Color.White)
-                                Text("⏰ 22h 55m 20s remaining", fontSize = 15.sp, color = Color.White)
+                                Text(
+                                    "⏰ 22h 55m 20s remaining",
+                                    fontSize = 15.sp,
+                                    color = Color.White
+                                )
                             }
 
                             Box(
                                 modifier = Modifier
                                     .height(35.dp)
                                     .width(110.dp)
-                                    .background(color = Color.Transparent, shape = RoundedCornerShape(10.dp))
-                                    .border(width = 1.dp, color = Color.White, shape = RoundedCornerShape(8.dp))
-                                    .padding(horizontal = 8.dp).clickable { navController.navigate(Routes.ViewAll) }
+                                    .background(
+                                        color = Color.Transparent,
+                                        shape = RoundedCornerShape(10.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(horizontal = 8.dp)
+                                    .clickable { navController.navigate(Routes.ViewAll) }
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -343,8 +441,8 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                     //------------IF SUCCESS THEN SHOW DOWN SCREEN(PRODUCT)--------------
                     //if(state=="success")NextScreen(productlist)
 
-                    when(val state=productState){
-                        is Result.Loading->{
+                    when (val state = productState) {
+                        is Result.Loading -> {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
@@ -352,26 +450,30 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 CircularProgressIndicator()
                             }
                         }
-                        is Result.Success->{
-                            NextScreen(state.data,navController)
+
+                        is Result.Success -> {
+                            NextScreen(state.data, navController)
                         }
-                        is Result.Failure->{
+
+                        is Result.Failure -> {
                             Box(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                                 contentAlignment = Alignment.Center
-                            ){
-                                Column (horizontalAlignment = Alignment.CenterHorizontally){
-                                    Text(text = "Error: ${state.message}",
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = "Error: ${state.message}",
                                         color = Color.Red
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    TextButton(onClick = {productViewModel.retryLoading()}) {
+                                    TextButton(onClick = { productViewModel.retryLoading() }) {
                                         Text(text = "Retry")
                                     }
                                 }
                             }
                         }
-                        is Result.Idle->{
+
+                        is Result.Idle -> {
                             // Initial state
                         }
                     }
@@ -406,32 +508,50 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
 }
 
 
-
 //------TOP PAR----------
 @Composable
-fun Top(){
-    Box(modifier = Modifier.fillMaxWidth().height(70.dp).background(color =Color(0xFFF1F1F1) )){
-        Column(modifier = Modifier.fillMaxWidth()){
+fun Top(navController: NavHostController) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(70.dp)
+        .background(color = Color(0xFFF1F1F1))) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Spacer(Modifier.height(20.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 20.dp, end = 20.dp)){
-                Icon(imageVector = Icons.Default.Menu, contentDescription = null, modifier = Modifier.size(35.dp), tint = Color.Black )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = null,
+                    modifier = Modifier.size(35.dp),
+                    tint = Color.Black
+                )
                 Spacer(Modifier.width(70.dp))
-                Image(painter = painterResource(R.drawable.icons), contentDescription = null, modifier = Modifier.size(120.dp))
+                Image(
+                    painter = painterResource(R.drawable.icons),
+                    contentDescription = null,
+                    modifier = Modifier.size(120.dp)
+                )
                 Spacer(Modifier.width(70.dp))
-                Image(painter = painterResource(R.drawable.avdarlogo), contentDescription = null, modifier = Modifier.size(120.dp))
+                Image(
+                    painter = painterResource(R.drawable.avdarlogo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clickable {
+                            navController.navigate(Routes.UserProfile)
+                        })
             }
         }
     }
 }
 
 
-
-
-
 @Composable
 fun BottomBar(
     navHostController: NavHostController,
-    selectedTab: Routes
+    selectedTab: Routes,
 ) {
     val pink = Color(0xFFFD6E87)
     val black = Color.Black
@@ -463,7 +583,7 @@ fun BottomBar(
             selectedColor = pink,
             unselectedColor = black
         ) {
-            navHostController.navigate(Routes.ViewAll){
+            navHostController.navigate(Routes.ViewAll) {
                 popUpTo(Routes.ViewAll) { inclusive = true }
                 launchSingleTop = true
             }
@@ -473,7 +593,7 @@ fun BottomBar(
         BottomBarItem(
             icon = Icons.Default.Search,
             label = "Search",
-            isSelected =false,
+            isSelected = false,
             selectedColor = pink,
             unselectedColor = black
         ) {
@@ -488,7 +608,7 @@ fun BottomBar(
             selectedColor = pink,
             unselectedColor = black
         ) {
-           // navHostController.navigate(Routes.Setting)
+            // navHostController.navigate(Routes.Setting)
         }
     }
 }
@@ -500,7 +620,7 @@ fun BottomBarItem(
     isSelected: Boolean,
     selectedColor: Color,
     unselectedColor: Color,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val color = if (isSelected) selectedColor else unselectedColor
 
@@ -537,14 +657,14 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
     //----------SHOWING GIRLS PRODUCTS---------------
     Box(modifier = Modifier.fillMaxWidth()) {
         LazyRow(
-            state =listState,
+            state = listState,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(start = 20.dp, end = 19.7.dp)
         ) {
             items(productList) { product ->
 
                 //-------FILTERING THE PRODUCT BECAUSE THIS IS OUR STYLISH APP-------
-                if (product.category == "women's-shoes" || product.category == "womens-dresses" || product.category=="womens-watches") {
+                if (product.category == "women's-shoes" || product.category == "womens-dresses" || product.category == "womens-watches") {
 
 
                     //--------MAKING TMP VARIABLE FOR SENDING PARAMETER TO PRODUCT CARD-------
@@ -573,8 +693,8 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                             price = price,
                             dprice = originalPrice,
                             stock = stock.toDouble(),
-                            discount=discount.toString(),
-                            onClick = {navController.navigate(Routes.ProductDetailScreen(product.id))}
+                            discount = discount.toString(),
+                            onClick = { navController.navigate(Routes.ProductDetailScreen(product.id)) }
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                     }
@@ -596,7 +716,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                 modifier = Modifier
                     .background(color = Color(0xFFBBBBBB), shape = CircleShape)
                     .size(40.dp)
-                    .clickable{
+                    .clickable {
                         coroutineScope.launch {
                             val scrollAmount = with(density) { 180.dp.toPx() } // ab sahi chalega
                             listState.animateScrollBy(-scrollAmount)
@@ -615,11 +735,13 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                 modifier = Modifier
                     .background(color = Color(0xFFBBBBBB), shape = CircleShape)
                     .size(40.dp)
-                    .clickable{coroutineScope.launch {
-                        val target = (listState.firstVisibleItemIndex + 1)
-                            .coerceAtMost(productList.lastIndex)
-                        listState.animateScrollToItem(target)
-                    }},
+                    .clickable {
+                        coroutineScope.launch {
+                            val target = (listState.firstVisibleItemIndex + 1)
+                                .coerceAtMost(productList.lastIndex)
+                            listState.animateScrollToItem(target)
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -658,15 +780,19 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                     )
                     Spacer(Modifier.width(30.dp))
                     Column {
-                        Text("Special Offers", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                        Text(
+                            "Special Offers",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
                         Spacer(Modifier.height(4.dp))
-                        Text("We make sure you get the", fontSize = 15.sp,color = Color.Black)
-                        Text("offer you need at best prices", fontSize = 15.sp,color = Color.Black)
+                        Text("We make sure you get the", fontSize = 15.sp, color = Color.Black)
+                        Text("offer you need at best prices", fontSize = 15.sp, color = Color.Black)
                     }
                 }
             }
             Spacer(Modifier.height(10.dp))
-
 
 
             //---------FLAT AND HEELS(JUST IMAGE)----------
@@ -720,7 +846,11 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                         modifier = Modifier
                             .height(35.dp)
                             .width(100.dp)
-                            .border(width = 1.dp, color = Color.White, shape = RoundedCornerShape(8.dp)),
+                            .border(
+                                width = 1.dp,
+                                color = Color.White,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Row(
@@ -746,7 +876,6 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
             Spacer(Modifier.height(10.dp))
 
 
-
             //--------------SHOWING MEN PRODUCTS----------------------
             Box(modifier = Modifier.fillMaxWidth()) {
                 LazyRow(
@@ -755,7 +884,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                     modifier = Modifier.padding(start = 2.dp, end = 2.dp)
                 ) {
                     items(productList) { product ->
-                        if (product.category == "mens-shirts" || product.category == "mens-shoes" || product.category=="mens-watches") {
+                        if (product.category == "mens-shirts" || product.category == "mens-shoes" || product.category == "mens-watches") {
                             val price = product.price
                             val discount = product.discountPercentage
                             val title = product.title
@@ -777,8 +906,14 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                                     price = price,
                                     dprice = originalPrice,
                                     stock = stock.toDouble(),
-                                    discount=discount.toString(),
-                                    onClick = {navController.navigate(Routes.ProductDetailScreen(product.id))}
+                                    discount = discount.toString(),
+                                    onClick = {
+                                        navController.navigate(
+                                            Routes.ProductDetailScreen(
+                                                product.id
+                                            )
+                                        )
+                                    }
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
                             }
@@ -798,9 +933,10 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                         modifier = Modifier
                             .background(color = Color(0xFFBBBBBB), shape = CircleShape)
                             .size(40.dp)
-                            .clickable{
+                            .clickable {
                                 coroutineScope.launch {
-                                    val scrollAmount = with(density) { 180.dp.toPx() } // ab sahi chalega
+                                    val scrollAmount =
+                                        with(density) { 180.dp.toPx() } // ab sahi chalega
                                     listState1.animateScrollBy(-scrollAmount)
 
                                 }
@@ -817,11 +953,13 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                         modifier = Modifier
                             .background(color = Color(0xFFBBBBBB), shape = CircleShape)
                             .size(40.dp)
-                            .clickable{coroutineScope.launch {
-                                val target = (listState1.firstVisibleItemIndex + 1)
-                                    .coerceAtMost(productList.lastIndex)
-                                listState1.animateScrollToItem(target)
-                            }},
+                            .clickable {
+                                coroutineScope.launch {
+                                    val target = (listState1.firstVisibleItemIndex + 1)
+                                        .coerceAtMost(productList.lastIndex)
+                                    listState1.animateScrollToItem(target)
+                                }
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -836,7 +974,9 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
             Spacer(Modifier.height(10.dp))
 
             //-------------ADS-------------
-            Box(modifier = Modifier.fillMaxWidth().height(200.dp)){
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)) {
                 Image(
                     painter = painterResource(R.drawable.adssuper),
                     contentDescription = null,
@@ -854,11 +994,9 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
 }
 
 
-
-
 //----------------NEXT SCREEN 2---------------------------
 @Composable
-fun Next2(){
+fun Next2() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -945,7 +1083,7 @@ fun Next2(){
                 )
             }
             Spacer(Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically){
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "up to 50% Off",
                     fontSize = 20.sp,
@@ -953,7 +1091,12 @@ fun Next2(){
                     color = Color.Black
                 )
                 Spacer(Modifier.width(170.dp))
-                Icon(imageVector = Icons.Default.ArrowForwardIos, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color.Black)
+                Icon(
+                    imageVector = Icons.Default.ArrowForwardIos,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = Color.Black
+                )
             }
 
         }
@@ -973,13 +1116,13 @@ fun ProductCard(
     dprice: Double,
     stock: Double,
     discount: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
             .height(300.dp)
             .width(170.dp)
-            .clickable{onClick()},
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),   // for rounded edges
         elevation = CardDefaults.cardElevation(3.dp), // <-- elevation here
         colors = CardDefaults.cardColors(containerColor = Color.White)

@@ -31,4 +31,7 @@ sealed class Routes(){
     @Serializable
     data object UserProfile: Routes()
 
+    @Serializable
+    data object PlaceOrderScreen: Routes()
+
 }

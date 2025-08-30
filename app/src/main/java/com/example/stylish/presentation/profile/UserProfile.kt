@@ -2,6 +2,7 @@ package com.example.stylish.presentation.profile
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import com.example.stylish.util.Result
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +52,6 @@ import com.example.stylish.ui.theme.Pink
 
 @Composable
 fun UserProfile(
-    profileViewModel: ProfileViewModel,
     viewModel: AddressAccountViewModel,
     navController: NavHostController
 ) {
@@ -132,7 +132,7 @@ fun UserProfile(
             verticalArrangement = Arrangement.Center,
         ) {
             IconButton(onClick = {}) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.clickable{navController.popBackStack()})
             }
         }
     }

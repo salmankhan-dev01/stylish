@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -39,96 +40,93 @@ import com.example.stylish.navigation.Routes
 @Composable
 fun ForgotScreen(navHostController: NavHostController){
     var email by remember { mutableStateOf("") }
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.White
-    ){
-        Column(Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Column(modifier = Modifier.fillMaxWidth().padding(20.dp).padding(start = 17.dp)) {
-                Text("Forgot", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold)
-                Text("password?", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold)
-            }
-            Spacer(Modifier.height(20.dp))
+    Scaffold { paddingValues ->
+        Surface(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            color = Color.White
+        ){
+            Column(Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(modifier = Modifier.fillMaxWidth().padding(20.dp).padding(start = 17.dp)) {
+                    Text("Forgot", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("password?", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold)
+                }
+                Spacer(Modifier.height(20.dp))
 
 
-            //------user or email
-            OutlinedTextField(value = email, onValueChange = {
-            email=it
-            }, placeholder = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.emaillogo),
-                        contentDescription = null,
-                        modifier = Modifier.size(25.dp)
-                    )
-                    Spacer(Modifier.width(4.dp))
+                //------user or email
+                OutlinedTextField(value = email,
+                    onValueChange = {
+                        email=it },
+                    placeholder = {
+                        Text(text = "Enter your email", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.usericon),
+                            contentDescription = "User Icon",
+                            modifier = Modifier.size(25.dp)
+                        )
+                    },
+
+                    shape = RoundedCornerShape(12.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        containerColor = Color(0xFFE7E7E7)
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 35.dp),
+                    singleLine = true
+                )
+                Spacer(Modifier.height(20.dp))
+
+                Row(Modifier.fillMaxWidth()) {
+                    Spacer(Modifier.width(40.dp))
+                    Text("*", fontSize = 15.sp, color = Color(0xFFF83758))
                     Text(
-                        "  Enter your email address",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
+                        " We will send you a message to set or rest",
+                        fontSize = 16.sp,
                         color = Color(
                             0xFF595959
                         )
                     )
+
                 }
-            },
-                shape = RoundedCornerShape(12.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = Color(0xFFE7E7E7)
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 35.dp)
-            )
-            Spacer(Modifier.height(20.dp))
-
-            Row(Modifier.fillMaxWidth()) {
-                Spacer(Modifier.width(40.dp))
-                Text("*", fontSize = 15.sp, color = Color(0xFFF83758))
-                Text(
-                    " We will send you a message to set or rest",
-                    fontSize = 16.sp,
-                    color = Color(
-                        0xFF595959
-                    )
-                )
-
-            }
-            Spacer(Modifier.height(5.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(Modifier.width(43.dp))
-                Text(
-                        "your new password", fontSize = 15.sp, color = Color(
-                0xFF595959
-                )
-                )
-
-            }
-
-
-            //--------LOGIN BUTTON -----------
-            Spacer(Modifier.height(50.dp))
-            Box(
-                modifier = Modifier.fillMaxWidth().clickable { navHostController.navigate(Routes.LoginScreen) }
-                    .height(55.dp).padding(horizontal = 35.dp)
-                    .background(
-                        color = Color(0xFFF83758), shape = RoundedCornerShape(9.dp)
-                    )
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
+                Spacer(Modifier.height(5.dp))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Spacer(Modifier.width(43.dp))
                     Text(
-                        "Submit",
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        "your new password", fontSize = 15.sp, color = Color(
+                            0xFF595959
+                        )
                     )
+
                 }
 
+
+                //--------LOGIN BUTTON -----------
+                Spacer(Modifier.height(50.dp))
+                Box(
+                    modifier = Modifier.fillMaxWidth().clickable { navHostController.navigate(Routes.LoginScreen) }
+                        .height(55.dp).padding(horizontal = 35.dp)
+                        .background(
+                            color = Color(0xFFF83758), shape = RoundedCornerShape(9.dp)
+                        )
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            "Submit",
+                            fontSize = 25.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                }
             }
         }
     }

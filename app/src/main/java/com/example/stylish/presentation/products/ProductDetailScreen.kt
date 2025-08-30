@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.Button
@@ -81,6 +83,8 @@ fun ProductDetailScreen(
     var selectedImageIndex by remember { mutableStateOf(0) }
     var isFavorite by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var cartCount by remember { mutableStateOf(2) } // cart items count
+
 
     val product = when (val state = productState) {
         is Result.Success -> {
@@ -109,6 +113,33 @@ fun ProductDetailScreen(
                         contentDescription = "favorite",
                         tint = if (isFavorite) Color.Red else Color.Gray
                     )
+                }
+                IconButton(onClick = {
+                }) {
+                    Box {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Cart",
+                            tint = Color.Black,
+                            modifier = Modifier.size(30.dp)
+                        )
+
+                        if (cartCount > 0) {
+                            Box(
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .background(Color.Red, shape = CircleShape)
+                                    .align(Alignment.TopEnd),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "$cartCount",
+                                    color = Color.White,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(

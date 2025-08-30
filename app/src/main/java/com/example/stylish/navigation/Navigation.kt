@@ -17,7 +17,6 @@ import com.example.stylish.data.remote.NetworkModule
 import com.example.stylish.data.repository.AddressAccountRepositoryImpl
 import com.example.stylish.data.repository.AuthRepositoryImpl
 import com.example.stylish.data.repository.ProductRepositoryImpl
-import com.example.stylish.data.repository.ProfileAndAddressUpdateRepositoryImpl
 import com.example.stylish.data.repository.UserPreferencesRepositoryImpl
 import com.example.stylish.domain.usecase.AddAddressUseCase
 import com.example.stylish.domain.usecase.AddBankAccountUseCase
@@ -27,10 +26,8 @@ import com.example.stylish.domain.usecase.GetBankAccountUseCase
 import com.example.stylish.domain.usecase.GetProductsUseCase
 import com.example.stylish.domain.usecase.GetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.GetUserUseCase
-import com.example.stylish.domain.usecase.GetUsernameUsecase
 import com.example.stylish.domain.usecase.LoginUseCase
 import com.example.stylish.domain.usecase.LogoutUseCase
-import com.example.stylish.domain.usecase.ProfileAndAddressUsecase
 import com.example.stylish.domain.usecase.SetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.SignUpUseCase
 import com.example.stylish.presentation.userPreference.UserPreferencesViewModel
@@ -48,8 +45,8 @@ import com.example.stylish.presentation.products.ViewAll
 import com.example.stylish.presentation.splash.SplashScreen
 import com.example.stylish.presentation.auth.AuthViewModel
 import com.example.stylish.presentation.auth.AuthViewModelFactory
+import com.example.stylish.presentation.products.PlaceOrderScreen
 import com.example.stylish.presentation.profile.AddressAccountViewModel
-import com.example.stylish.presentation.profile.ProfileViewModel
 import com.example.stylish.presentation.profile.UserProfile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -76,12 +73,12 @@ fun Navigation(){
     val userPreferenceState by userPreferenceViewModel.state.collectAsState()
 
 
-    // Username and Address adding and updating
-    val profileAndAddressUpdateRepositoryImpl=remember { ProfileAndAddressUpdateRepositoryImpl(
-        FirebaseAuth.getInstance(),FirebaseFirestore.getInstance()) }
-    val getUsernameUsecase=remember { GetUsernameUsecase(profileAndAddressUpdateRepositoryImpl) }
-    val profileAndAddressUsecase=remember { ProfileAndAddressUsecase(profileAndAddressUpdateRepositoryImpl) }
-    val profileViewModel=remember { ProfileViewModel(getUsernameUsecase,profileAndAddressUsecase) }
+//    // Username and Address adding and updating
+//    val profileAndAddressUpdateRepositoryImpl=remember { ProfileAndAddressUpdateRepositoryImpl(
+//        FirebaseAuth.getInstance(),FirebaseFirestore.getInstance()) }
+//    val getUsernameUsecase=remember { GetUsernameUsecase(profileAndAddressUpdateRepositoryImpl) }
+//    val profileAndAddressUsecase=remember { ProfileAndAddressUsecase(profileAndAddressUpdateRepositoryImpl) }
+//    val profileViewModel=remember { ProfileViewModel(getUsernameUsecase,profileAndAddressUsecase) }
 
 // ------------------------- profile me user address and account room+firebase ----------------------------
     // 1️⃣ Room / Dao instances
@@ -117,7 +114,7 @@ fun Navigation(){
     // Get ViewModel with factory
     val viewModel: AuthViewModel = viewModel(factory = factory)
 
-    NavHost(navController=navController, startDestination = Routes.SignupScreen){
+    NavHost(navController=navController, startDestination = Routes.ProductScreen){
         //NAV GRAPH
         composable<Routes.SplashScreen> {
             SplashScreen()
@@ -154,7 +151,10 @@ fun Navigation(){
             ProductDetailScreen(navController,productViewModel,args.productId)
         }
         composable<Routes.UserProfile> {
-            UserProfile(profileViewModel,viewModel1,navController)
+            UserProfile(viewModel1,navController)
+        }
+        composable <Routes.PlaceOrderScreen>{
+            PlaceOrderScreen()
         }
     }
 //    LaunchedEffect(userPreferenceState.isLoading,userPreferenceState.isLoggedIn,userPreferenceState.isFirstTimeLogin) {

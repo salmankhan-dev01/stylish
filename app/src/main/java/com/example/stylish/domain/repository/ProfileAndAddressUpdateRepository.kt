@@ -5,7 +5,7 @@ import com.example.stylish.util.Result
 
 interface ProfileAndAddressUpdateRepository {
 
-    suspend fun getUsername(): User
+    suspend fun getUsernme(): User
     suspend fun updateUsername( newUsername: String): Result<String>
 
 }

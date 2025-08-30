@@ -31,10 +31,10 @@ import com.example.stylish.navigation.Routes
 fun SkipScreen1(navHostController: NavHostController) {
     Scaffold(
         topBar = {
-            Top(navHostController)
+            Top1(navHostController)
         },
         bottomBar = {
-            Down(navHostController)
+            Down1(navHostController)
         }
     ) {
         Surface(
@@ -90,7 +90,7 @@ fun SkipScreen1(navHostController: NavHostController) {
 }
 
 @Composable
-fun Top(navHostController: NavHostController) {
+fun Top1(navHostController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -125,7 +125,7 @@ fun Top(navHostController: NavHostController) {
 
 
 @Composable
-fun Down(navHostController: NavHostController) {
+fun Down1(navHostController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()

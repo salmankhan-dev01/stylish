@@ -56,10 +56,9 @@ fun HomeScreen(navHostController: NavHostController){
             Box(
                 modifier = Modifier
                     .fillMaxWidth().clickable {
-//                        navHostController.navigate(Routes.ProductScreen) {
-//                            popUpTo(Routes.HomeScreen) { inclusive=true }
-//                        }
-                        navHostController.navigate(Routes.UserProfile)
+                        navHostController.navigate(Routes.ProductScreen) {
+                            popUpTo(Routes.HomeScreen) { inclusive=true }
+                        }
                     }
                     .height(55.dp)
                     .padding(horizontal = 35.dp)

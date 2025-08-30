@@ -1,5 +1,6 @@
 package com.example.stylish.presentation.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stylish.domain.usecase.LoginUseCase
@@ -20,10 +21,14 @@ class AuthViewModel(
     fun login(email: String, password: String) {
         // Validate inputs before proceeding
         if (email.isBlank() || password.isBlank()) {
+            Log.d("impt123","this is reach1")
             _authState.value = Result.Failure("Email and password cannot be empty")
             return
-        }
+        }else if(password.length<6){
+            _authState.value = Result.Failure("Password is so small")
+            return
 
+        }
         _authState.value = Result.Loading
         viewModelScope.launch {
             try {
@@ -38,7 +43,7 @@ class AuthViewModel(
     fun signup(email: String, password: String) {
         // Validate inputs before proceeding
         if (email.isBlank() || password.isBlank()) {
-            _authState.value = Result.Failure("Email and password cannot be empty")
+            _authState.value = Result.Failure("Email cannot be empty")
             return
         }
 

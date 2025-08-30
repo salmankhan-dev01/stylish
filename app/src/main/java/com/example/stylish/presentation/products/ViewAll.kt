@@ -57,7 +57,7 @@ fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
-        topBar = { Top() },
+        topBar = { Top(navController) },
         bottomBar = {
             BottomBar(
                 navController,

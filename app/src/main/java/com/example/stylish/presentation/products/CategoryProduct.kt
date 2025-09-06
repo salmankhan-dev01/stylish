@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterAlt
@@ -44,15 +40,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.stylish.domain.model.Product
 import com.example.stylish.navigation.Routes
 import com.example.stylish.util.Result
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel) {
+fun CategoryProduct(
+    navController: NavHostController,
+    productViewModel: ProductViewModel,
+    productCategory: List<String>
+) {
     val productState by productViewModel.productState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
 
@@ -73,7 +70,6 @@ fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
                 value = searchQuery, onValueChange = { searchQuery = it },
-
                 placeholder = {
                     Text(
                         "Search any Product",
@@ -199,9 +195,12 @@ fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel
                 }
 
                 is Result.Success -> {
-                    AllProducts(state.data.filter {product ->
-                        product.title.contains(searchQuery, ignoreCase = true) ||
-                                levenshtein(product.title.lowercase(),searchQuery.lowercase())<=2
+
+                    AllProducts(state.data.filter { products ->
+                        productCategory.contains(products.category) && (products.title.contains(searchQuery, ignoreCase = true) ||
+                                levenshtein(products.title.lowercase(),searchQuery.lowercase())<=2
+                                )
+
                     }, navController)
                 }
 
@@ -230,67 +229,5 @@ fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel
 
 }
 
-@Composable
-fun AllProducts(
-    productList: List<Product>,
-    navController: NavHostController,
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(productList) { product ->
-            val title = product.title
-            val image = product.thumbnail
-            val description = product.description
-            val rating = product.rating
-            val stock = product.stock
-            val discount = product.discountPercentage
-            val price = product.price
-
-            if (
-                price != null && discount != null && title != null &&
-                image != null && description != null && rating != null && stock != null
-            ) {
-                val originalPrice = BigDecimal(price / (1 - discount / 100))
-                    .setScale(2, RoundingMode.HALF_UP)
-                    .toDouble()
-                ProductCard(
-                    title = title,
-                    image = image,
-                    dis = description,
-                    rating = rating,
-                    price = price,
-                    dprice = originalPrice,
-                    stock = stock.toDouble(),
-                    discount = discount.toString(),
-                    onClick = { navController.navigate(Routes.ProductDetailScreen(product.id)) }
-                )
-            }
-
-
-
-        }
-    }
-}
-
-
-fun levenshtein(a: String, b: String): Int {
-    val dp = Array(a.length + 1) { IntArray(b.length + 1) }
-
-    for (i in 0..a.length) dp[i][0] = i
-    for (j in 0..b.length) dp[0][j] = j
-
-    for (i in 1..a.length) {
-        for (j in 1..b.length) {
-            dp[i][j] = if (a[i - 1] == b[j - 1]) dp[i - 1][j - 1]
-            else 1 + minOf(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1])
-        }
-    }
-    return dp[a.length][b.length]
-}
 
 

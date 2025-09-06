@@ -69,7 +69,7 @@ class AddressAccountRepositoryImpl(
             if (remote != null) {
                 bankAccountDao.insert(remote)
 
-                Result.Success(remote)
+                 Result.Success(remote)
             } else {
 
                 Result.Failure("No bank account found")
@@ -94,9 +94,13 @@ class AddressAccountRepositoryImpl(
         return try {
             val local=userDao.getLatestUser()
             if(local!=null) return Result.Success(local)
+            Log.d("uidname","fetching in firebase")
             val remote=firebaseService.getUser()
+            Log.d("uidname","fetched in firebase")
             if (remote!=null){
+
                 userDao.insert(remote)
+                Log.d("uidname","data added in table")
                 Result.Success(remote)
             }else{
                 Result.Failure("No user found")
@@ -108,8 +112,9 @@ class AddressAccountRepositoryImpl(
 
     override suspend fun logout(): Result<String> {
         return  try {
-            bankAccountDao.clear()       // BankAccountDao me already clear() hai
+            bankAccountDao.clear()
             addressDao.clear()
+            userDao.clear()
             firebaseService.logout()
             Result.Success("User logout success")
         }catch (e: Exception){

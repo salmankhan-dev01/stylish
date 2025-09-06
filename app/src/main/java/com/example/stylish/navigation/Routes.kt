@@ -34,4 +34,10 @@ sealed class Routes(){
     @Serializable
     data object PlaceOrderScreen: Routes()
 
+    @Serializable
+    data class PaymentScreen(val totalPrice: Double): Routes()
+
+    @Serializable
+    data class CategoryProduct(val productCategory: String): Routes()
+
 }

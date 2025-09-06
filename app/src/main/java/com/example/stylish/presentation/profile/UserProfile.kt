@@ -84,6 +84,7 @@ fun UserProfile(
         viewModel.fetchUser()
     }
 
+
     // ---------------- Update UI when data arrives ----------------
     LaunchedEffect(addressResult) {
         if (addressResult is Result.Success) {

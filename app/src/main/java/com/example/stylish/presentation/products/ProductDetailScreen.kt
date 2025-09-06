@@ -2,7 +2,6 @@ package com.example.stylish.presentation.products
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,10 +80,11 @@ fun ProductDetailScreen(
     productId: Int,
 ) {
     val productState by productViewModel.productState.collectAsState()
+    val addCartState by productViewModel.addCart.collectAsState()
+    val getCartState by productViewModel.getCart.collectAsState()
     var selectedImageIndex by remember { mutableStateOf(0) }
     var isFavorite by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var cartCount by remember { mutableStateOf(2) } // cart items count
 
 
     val product = when (val state = productState) {
@@ -93,6 +94,17 @@ fun ProductDetailScreen(
 
         else -> null
     }
+
+    LaunchedEffect(Unit) {
+        productViewModel.getToCart()
+    }
+
+    val cartCount = when (val state = getCartState) {
+        is Result.Success -> state.data.sumOf { it.quantity }
+        else -> 0
+    }
+
+
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(text = "Product Details") },
@@ -103,11 +115,18 @@ fun ProductDetailScreen(
             },
             actions = {
                 IconButton(onClick = {
-                    product?.let { shareProduct(it,context) }
+                    product?.let { shareProduct(it, context) }
                 }) {
                     Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
                 }
-                IconButton(onClick = { isFavorite = !isFavorite }) {
+                IconButton(onClick = {
+                    if(isFavorite){
+
+                    }
+                    isFavorite = !isFavorite
+
+
+                }) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "favorite",
@@ -115,6 +134,7 @@ fun ProductDetailScreen(
                     )
                 }
                 IconButton(onClick = {
+                    navController.navigate(Routes.PlaceOrderScreen)
                 }) {
                     Box {
                         Icon(
@@ -188,7 +208,9 @@ fun ProductDetailScreen(
                     item {
                         AddToCartSection(
                             product = product,
-                            onAddToCart = {}
+                            productViewModel = productViewModel,
+                            addCartState = addCartState,
+                            navController = navController
                         )
                     }
 
@@ -197,12 +219,13 @@ fun ProductDetailScreen(
                         val similarProducts = (productState as? Result.Success)?.data?.filter {
                             it.category == product.category
                         } ?: emptyList()
-                        if(similarProducts.size>0){
-                            Text(text = "Similar To", fontSize = 24.sp,
+                        if (similarProducts.size > 0) {
+                            Text(
+                                text = "Similar To", fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black,
                                 modifier = Modifier.padding(horizontal = 20.dp)
-                                )
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -427,7 +450,7 @@ fun ProductDetailsSection(product: Product) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "₹${String.format("%.2f", product.price )}",
+                text = "₹${String.format("%.2f", product.price)}",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
@@ -436,7 +459,7 @@ fun ProductDetailsSection(product: Product) {
                 Spacer(modifier = Modifier.width(12.dp))
                 val originalPrice = product.price / (1 - product.discountPercentage / 100)
                 Text(
-                    text = "₹${String.format("%.2f", originalPrice )}",
+                    text = "₹${String.format("%.2f", originalPrice)}",
                     fontSize = 18.sp,
                     color = Color.Gray,
                     textDecoration = TextDecoration.LineThrough
@@ -527,11 +550,16 @@ fun StarRating(rating: Double, starSize: Dp = 16.dp, marStars: Int = 5) {
 @Composable
 fun AddToCartSection(
     product: Product,
-    onAddToCart: () -> Unit,
+    productViewModel: ProductViewModel,
+    addCartState: Result<String>,
+    navController: NavHostController,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Button(
-            onClick = onAddToCart,
+            onClick = {
+                productViewModel.addToCart(product.id.toString(), 1)
+
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -551,7 +579,10 @@ fun AddToCartSection(
         }
         Spacer(modifier = Modifier.height(12.dp))
         Button(
-            onClick = { Log.d("ProductC", product.category) },
+            onClick = {
+                productViewModel.addToCart(product.id.toString(), 1)
+                navController.navigate(Routes.PlaceOrderScreen)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -569,24 +600,42 @@ fun AddToCartSection(
                 fontWeight = FontWeight.Bold
             )
         }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            when (addCartState) {
+                is Result.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                is Result.Failure -> {
+                    Text(text = addCartState.message ?: "Error", color = Color.Red)
+                }
+
+                else -> {}
+            }
+        }
 
     }
 }
 
 // share function of product
 
-fun shareProduct(product: Product,context: Context){
-    val shareText="Check out this amazing product: ${product.title} \n\n" +
+fun shareProduct(product: Product, context: Context) {
+    val shareText = "Check out this amazing product: ${product.title} \n\n" +
             "${product.description}\n\n" +
             "Price: ₹${String.format("%.2f", product.price)}\n" +
             "Rating: ${String.format("%.1f", product.rating)} stars\n\n" +
             "Get it now on Stylish!"
-    val shareIntent= Intent().apply {
-        action =Intent.ACTION_SEND
-        type ="text/plain"
-        putExtra(Intent.EXTRA_TEXT,shareText)
-        putExtra(Intent.EXTRA_SUBJECT,"Check out ${product.title}")
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, shareText)
+        putExtra(Intent.EXTRA_SUBJECT, "Check out ${product.title}")
     }
-    val chooserIntent= Intent.createChooser(shareIntent,"Share Product")
+    val chooserIntent = Intent.createChooser(shareIntent, "Share Product")
     context.startActivity(chooserIntent)
 }

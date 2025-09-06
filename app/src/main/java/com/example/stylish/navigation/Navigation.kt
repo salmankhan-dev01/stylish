@@ -20,9 +20,11 @@ import com.example.stylish.data.repository.ProductRepositoryImpl
 import com.example.stylish.data.repository.UserPreferencesRepositoryImpl
 import com.example.stylish.domain.usecase.AddAddressUseCase
 import com.example.stylish.domain.usecase.AddBankAccountUseCase
+import com.example.stylish.domain.usecase.AddToCartUseCase
 import com.example.stylish.domain.usecase.AddUserUseCase
 import com.example.stylish.domain.usecase.GetAddressUseCase
 import com.example.stylish.domain.usecase.GetBankAccountUseCase
+import com.example.stylish.domain.usecase.GetCartItemsUseCase
 import com.example.stylish.domain.usecase.GetProductsUseCase
 import com.example.stylish.domain.usecase.GetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.GetUserUseCase
@@ -45,6 +47,8 @@ import com.example.stylish.presentation.products.ViewAll
 import com.example.stylish.presentation.splash.SplashScreen
 import com.example.stylish.presentation.auth.AuthViewModel
 import com.example.stylish.presentation.auth.AuthViewModelFactory
+import com.example.stylish.presentation.products.CategoryProduct
+import com.example.stylish.presentation.products.PaymentScreen
 import com.example.stylish.presentation.products.PlaceOrderScreen
 import com.example.stylish.presentation.profile.AddressAccountViewModel
 import com.example.stylish.presentation.profile.UserProfile
@@ -60,9 +64,11 @@ fun Navigation(){
 
 
     //for fetch product form api
-    val productPepo= remember{ ProductRepositoryImpl(NetworkModule.productApiService) }
+    val productPepo= remember{ ProductRepositoryImpl(NetworkModule.productApiService, firestore = FirebaseFirestore.getInstance(), auth = FirebaseAuth.getInstance()) }
     val getProductsUseCase=remember { GetProductsUseCase(productPepo) }
-    val productViewModel=remember { ProductViewModel(getProductsUseCase) }
+    val addToCartUseCase=remember { AddToCartUseCase(productPepo) }
+    val getToCartUseCase=remember { GetCartItemsUseCase(productPepo) }
+    val productViewModel=remember { ProductViewModel(getProductsUseCase,addToCartUseCase,getToCartUseCase) }
 
     // for user preferences
     val userPreferencesDataStore=remember { UserPreferencesDataStore(context) }
@@ -154,11 +160,20 @@ fun Navigation(){
             UserProfile(viewModel1,navController)
         }
         composable <Routes.PlaceOrderScreen>{
-            PlaceOrderScreen()
+            PlaceOrderScreen(navController,productViewModel,viewModel1)
+        }
+        composable <Routes.PaymentScreen>{backStackEntry->
+            val args=backStackEntry.toRoute<Routes.PaymentScreen>()
+            PaymentScreen(navController,args.totalPrice)
+        }
+        composable <Routes.CategoryProduct>{backStackEntry->
+            val args=backStackEntry.toRoute<Routes.CategoryProduct>()
+            val categoryList = args.productCategory.split(",")
+            CategoryProduct(navController,productViewModel,categoryList)
         }
     }
 //    LaunchedEffect(userPreferenceState.isLoading,userPreferenceState.isLoggedIn,userPreferenceState.isFirstTimeLogin) {
-//        if(!userPreferenceState.isLoading){
+//        if(!userPreferenceState   .isLoading){
 //            val destination=when{
 //                userPreferenceState.isLoggedIn-> Routes.ProductScreen
 //                userPreferenceState.isFirstTimeLogin-> Routes.SkipScreen1

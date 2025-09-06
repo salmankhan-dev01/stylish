@@ -63,6 +63,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -82,6 +83,7 @@ import com.example.stylish.navigation.Routes
 import com.example.stylish.util.Result
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import okhttp3.Route
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -101,12 +103,24 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
     //----------Category(Image and Text)----------
     val imageList = listOf(
         R.drawable.one,
+        R.drawable.four,
+        R.drawable.five,
         R.drawable.two,
         R.drawable.three,
-        R.drawable.four,
-        R.drawable.five
+        R.drawable.six,
+        R.drawable.seven,
     )
-    val nameList = listOf("Beauty", "Fashion", "kids", "Mens", "Woman")
+    val nameList =
+        listOf("Beauty", "Mens", "Woman", "Groceries", "Furniture", "Fragrances", "Kitchen")
+    val categoryMap = mapOf(
+        "Beauty" to listOf("beauty"),
+        "Mens" to listOf("mens-watches", "mens-shirts", "mens-shoes"),
+        "Woman" to listOf("womens-watches", "womens-dresses", "womens-shoes"),
+        "Groceries" to listOf("groceries"),
+        "Furniture" to listOf("furniture"),
+        "Fragrances" to listOf("fragrances"),
+        "Kitchen" to listOf("kitchen-accessories"),
+    )
 
 
     //----------USER INTERFACE------------------
@@ -114,8 +128,12 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
         topBar = { Top(navController) },
         bottomBar = { BottomBar(navController, Routes.ProductScreen) },
         modifier = Modifier.fillMaxSize()
-    ) {
-        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF1F1F1)) {
+    ) { paddingValues ->
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues), color = Color(0xFFF1F1F1)
+        ) {
 
             //BOX BECAUSE WE HAVE TO SHOW LOADING IN MIDDLE
             Box(modifier = Modifier.fillMaxSize()) {
@@ -124,14 +142,14 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(it)
                         .verticalScroll(rememberScrollState())
                 ) {
                     Spacer(Modifier.height(20.dp))
 
                     //----SEARCH BOX----------------
                     OutlinedTextField(
-                        value = searchQuery, onValueChange = { searchQuery = it },
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
@@ -142,9 +160,7 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                         },
                         placeholder = {
                             Text(
-                                "Search any Product",
-                                fontSize = 14.sp,
-                                color = Color(0xFFBBBBBB)
+                                "Search any Product", fontSize = 14.sp, color = Color(0xFFBBBBBB)
                             )
                         },
                         trailingIcon = {
@@ -167,9 +183,7 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                             .height(56.dp)
                             .padding(horizontal = 15.dp)
                             .shadow(
-                                elevation = 4.dp,
-                                shape = RoundedCornerShape(10.dp),
-                                clip = false
+                                elevation = 4.dp, shape = RoundedCornerShape(10.dp), clip = false
                             )
 
                     )
@@ -188,7 +202,8 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 Text(
                                     text = "${state.data.size} Items",
                                     fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold, color = Color.Black
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
                                 )
                             }
 
@@ -272,16 +287,23 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                         contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
                         itemsIndexed(imageList) { index, image ->
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.clickable {
+                                    val categories =
+                                        categoryMap[nameList[index]]?.joinToString(",") ?: ""
+                                    navController.navigate(Routes.CategoryProduct(categories))
+                                }) {
                                 Image(
                                     painter = painterResource(id = image),
                                     contentDescription = null,
-                                    modifier = Modifier.size(56.dp)
+                                    modifier = Modifier
+                                        .size(56.dp)
+                                        .clip(CircleShape)
                                 )
                                 Text(
                                     text = nameList[index],  // ✅ Safe access
-                                    fontSize = 15.sp,
-                                    color = Color.Black
+                                    fontSize = 15.sp, color = Color.Black
                                 )
                             }
                         }
@@ -305,9 +327,11 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                 contentScale = ContentScale.Crop  // 🟢 Key line to cover the box
                             )
                         }
-                        Column(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 20.dp)) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 20.dp)
+                        ) {
                             Spacer(Modifier.height(40.dp))
                             Text(
                                 "50-40% OFF",
@@ -325,8 +349,7 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                     .height(35.dp)
                                     .width(110.dp)
                                     .background(
-                                        color = Color.Transparent,
-                                        shape = RoundedCornerShape(10.dp)
+                                        color = Color.Transparent, shape = RoundedCornerShape(10.dp)
                                     )
                                     .border(
                                         width = 1.dp,
@@ -334,16 +357,14 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .padding(horizontal = 8.dp) // spacing inside box
-                            ) {
+                                    .clickable { navController.navigate(Routes.ViewAll) }) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Center,
                                     modifier = Modifier.fillMaxSize()
                                 ) {
                                     Text(
-                                        text = "Shop Now",
-                                        fontSize = 15.sp,
-                                        color = Color.White
+                                        text = "Shop Now", fontSize = 15.sp, color = Color.White
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Icon(
@@ -393,9 +414,7 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                             ) {
                                 Text("Deal of the Day", fontSize = 15.sp, color = Color.White)
                                 Text(
-                                    "⏰ 22h 55m 20s remaining",
-                                    fontSize = 15.sp,
-                                    color = Color.White
+                                    "⏰ 22h 55m 20s remaining", fontSize = 15.sp, color = Color.White
                                 )
                             }
 
@@ -404,8 +423,7 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                     .height(35.dp)
                                     .width(110.dp)
                                     .background(
-                                        color = Color.Transparent,
-                                        shape = RoundedCornerShape(10.dp)
+                                        color = Color.Transparent, shape = RoundedCornerShape(10.dp)
                                     )
                                     .border(
                                         width = 1.dp,
@@ -413,17 +431,14 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .padding(horizontal = 8.dp)
-                                    .clickable { navController.navigate(Routes.ViewAll) }
-                            ) {
+                                    .clickable { navController.navigate(Routes.ViewAll) }) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Center,
                                     modifier = Modifier.fillMaxSize()
                                 ) {
                                     Text(
-                                        text = "View all",
-                                        fontSize = 15.sp,
-                                        color = Color.White
+                                        text = "View all", fontSize = 15.sp, color = Color.White
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Icon(
@@ -457,13 +472,14 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
 
                         is Result.Failure -> {
                             Box(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
-                                        text = "Error: ${state.message}",
-                                        color = Color.Red
+                                        text = "Error: ${state.message}", color = Color.Red
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     TextButton(onClick = { productViewModel.retryLoading() }) {
@@ -481,26 +497,6 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
 
                 }
 
-                //SHOWING LOADING IN MIDDLE OF SCREEN
-//                when(state){
-//                    "loading"->{
-//                        //---------COLUMN TWO-------------
-//                        Column(modifier =Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-//                            CircularProgressIndicator(
-//                                strokeWidth = 7.dp,
-//                                modifier = Modifier.size(60.dp)
-//                            )
-//                        }
-//                    }
-//                    "error"->{
-//                        //--------COLUMN THREE------------
-//                        Column(modifier =Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-//                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                                Text("Failed to Load!", color = Color.Red)
-//                            }
-//                        }
-//                    }
-//                }
             }
 
         }
@@ -511,10 +507,12 @@ fun ProductScreen(navController: NavHostController, productViewModel: ProductVie
 //------TOP PAR----------
 @Composable
 fun Top(navController: NavHostController) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .height(70.dp)
-        .background(color = Color(0xFFF1F1F1))) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp)
+            .background(color = Color(0xFFF1F1F1))
+    ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Spacer(Modifier.height(20.dp))
             Row(
@@ -627,8 +625,7 @@ fun BottomBarItem(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.clickable { onClick() }
-    ) {
+        modifier = Modifier.clickable { onClick() }) {
         Icon(
             imageVector = icon,
             contentDescription = label,
@@ -636,10 +633,7 @@ fun BottomBarItem(
             modifier = Modifier.size(30.dp)
         )
         Text(
-            text = label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = color
+            text = label, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = color
         )
     }
 }
@@ -664,9 +658,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
             items(productList) { product ->
 
                 //-------FILTERING THE PRODUCT BECAUSE THIS IS OUR STYLISH APP-------
-                if (product.category == "women's-shoes" || product.category == "womens-dresses" || product.category == "womens-watches") {
-
-
+                if (product.category == "womens-shoes" || product.category == "womens-dresses" || product.category == "womens-watches") {
                     //--------MAKING TMP VARIABLE FOR SENDING PARAMETER TO PRODUCT CARD-------
                     val price = product.price
                     val discount = product.discountPercentage
@@ -679,10 +671,10 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
 
                     //--------------CHECKING IF PRODUCT ITEM NOT NULL--------------
                     if (price != null && discount != null && title != null && image != null && description != null && rating != null && stock != null) {
-                        val originalPrice = BigDecimal(price / (1 - discount / 100))
-                            .setScale(2, RoundingMode.HALF_UP)
-                            .toDouble()
-
+                        val originalPrice = BigDecimal(price / (1 - discount / 100)).setScale(
+                                2,
+                                RoundingMode.HALF_UP
+                            ).toDouble()
 
                         //--------------IF ALL OK THEN PASS THE PARAMETER TO THE PRODUCT CARD COMPOSABLE FUNCTION--------------
                         ProductCard(
@@ -694,8 +686,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                             dprice = originalPrice,
                             stock = stock.toDouble(),
                             discount = discount.toString(),
-                            onClick = { navController.navigate(Routes.ProductDetailScreen(product.id)) }
-                        )
+                            onClick = { navController.navigate(Routes.ProductDetailScreen(product.id)) })
                         Spacer(modifier = Modifier.width(10.dp))
                     }
                 }
@@ -722,8 +713,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                             listState.animateScrollBy(-scrollAmount)
 
                         }
-                    },
-                contentAlignment = Alignment.Center
+                    }, contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBackIos,
@@ -737,12 +727,11 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                     .size(40.dp)
                     .clickable {
                         coroutineScope.launch {
-                            val target = (listState.firstVisibleItemIndex + 1)
-                                .coerceAtMost(productList.lastIndex)
+                            val target =
+                                (listState.firstVisibleItemIndex + 1).coerceAtMost(productList.lastIndex)
                             listState.animateScrollToItem(target)
                         }
-                    },
-                contentAlignment = Alignment.Center
+                    }, contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowForwardIos,
@@ -836,9 +825,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "⏰Last Date 29/02/22",
-                            fontSize = 12.sp,
-                            color = Color.White
+                            text = "⏰Last Date 29/02/22", fontSize = 12.sp, color = Color.White
                         )
                     }
 
@@ -847,10 +834,9 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                             .height(35.dp)
                             .width(100.dp)
                             .border(
-                                width = 1.dp,
-                                color = Color.White,
-                                shape = RoundedCornerShape(8.dp)
-                            ),
+                                width = 1.dp, color = Color.White, shape = RoundedCornerShape(8.dp)
+                            )
+                            .clickable { navController.navigate(Routes.ViewAll) },
                         contentAlignment = Alignment.Center
                     ) {
                         Row(
@@ -858,9 +844,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "View all",
-                                fontSize = 14.sp,
-                                color = Color.White
+                                text = "View all", fontSize = 14.sp, color = Color.White
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Icon(
@@ -894,9 +878,11 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                             val stock = product.stock
 
                             if (price != null && discount != null && title != null && image != null && description != null && rating != null && stock != null) {
-                                val originalPrice = BigDecimal(price / (1 - discount / 100))
-                                    .setScale(2, RoundingMode.HALF_UP)
-                                    .toDouble()
+                                val originalPrice =
+                                    BigDecimal(price / (1 - discount / 100)).setScale(
+                                            2,
+                                            RoundingMode.HALF_UP
+                                        ).toDouble()
 
                                 ProductCard(
                                     title = title,
@@ -913,8 +899,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                                                 product.id
                                             )
                                         )
-                                    }
-                                )
+                                    })
                                 Spacer(modifier = Modifier.width(10.dp))
                             }
                         }
@@ -931,7 +916,9 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(color = Color(0xFFBBBBBB), shape = CircleShape)
+                            .background(
+                                color = Color(0xFFBBBBBB), shape = CircleShape
+                            )
                             .size(40.dp)
                             .clickable {
                                 coroutineScope.launch {
@@ -940,8 +927,7 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                                     listState1.animateScrollBy(-scrollAmount)
 
                                 }
-                            },
-                        contentAlignment = Alignment.Center
+                            }, contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIos,
@@ -951,16 +937,19 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                     }
                     Box(
                         modifier = Modifier
-                            .background(color = Color(0xFFBBBBBB), shape = CircleShape)
+                            .background(
+                                color = Color(0xFFBBBBBB), shape = CircleShape
+                            )
                             .size(40.dp)
                             .clickable {
                                 coroutineScope.launch {
-                                    val target = (listState1.firstVisibleItemIndex + 1)
-                                        .coerceAtMost(productList.lastIndex)
+                                    val target =
+                                        (listState1.firstVisibleItemIndex + 1).coerceAtMost(
+                                            productList.lastIndex
+                                        )
                                     listState1.animateScrollToItem(target)
                                 }
-                            },
-                        contentAlignment = Alignment.Center
+                            }, contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowForwardIos,
@@ -974,9 +963,11 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
             Spacer(Modifier.height(10.dp))
 
             //-------------ADS-------------
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            ) {
                 Image(
                     painter = painterResource(R.drawable.adssuper),
                     contentDescription = null,
@@ -987,7 +978,9 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
                 )
             }
             //NEXT SCREEN
-            Next2()
+            Next2(
+                onClick = {navController.navigate(Routes.ViewAll)}
+            )
 
         }
     }
@@ -996,7 +989,9 @@ fun NextScreen(productList: List<Product>, navController: NavHostController) {
 
 //----------------NEXT SCREEN 2---------------------------
 @Composable
-fun Next2() {
+fun Next2(
+    onClick: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -1010,37 +1005,28 @@ fun Next2() {
         ) {
             Column {
                 Text(
-                    text = "New Arrivals",
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                    text = "New Arrivals", style = TextStyle(
+                        fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black
                     )
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Summer’ 25 Collections",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black
+                    text = "Summer’ 25 Collections", style = TextStyle(
+                        fontSize = 18.sp, fontWeight = FontWeight.Normal, color = Color.Black
                     )
                 )
             }
 
             Button(
-                onClick = { },
+                onClick = { onClick() },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFD6E87),
-                    contentColor = Color.White
+                    containerColor = Color(0xFFFD6E87), contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "View all",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = "View all", fontSize = 16.sp, fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Icon(

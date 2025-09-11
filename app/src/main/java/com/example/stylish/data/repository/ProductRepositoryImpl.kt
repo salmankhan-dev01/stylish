@@ -3,11 +3,13 @@ package com.example.stylish.data.repository
 import android.util.Log
 import com.example.stylish.data.remote.ProductApiService
 import com.example.stylish.domain.model.CartItem
+import com.example.stylish.domain.model.FavoriteItem
 import com.example.stylish.domain.model.Product
 import com.example.stylish.domain.repository.ProductRepository
 import com.example.stylish.util.Result
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.protobuf.LazyStringArrayList.emptyList
 import kotlinx.coroutines.tasks.await
 
 class ProductRepositoryImpl(private val apiService: ProductApiService,private val firestore: FirebaseFirestore,private val auth: FirebaseAuth): ProductRepository {
@@ -67,4 +69,65 @@ class ProductRepositoryImpl(private val apiService: ProductApiService,private va
             Result.Failure(e.localizedMessage ?: "Error fetching cart")
         }
     }
+
+    override suspend fun toggleFavorite(productId: String): Boolean {
+        val uid = auth.currentUser?.uid
+            ?: return false
+
+        val favoritesCollection = firestore.collection("users")
+            .document(uid)
+            .collection("favorites")
+
+        val productDocRef = favoritesCollection.document(productId)
+
+        return try {
+            val snapshot = productDocRef.get().await()
+            if (snapshot.exists()) {
+                // Already favorite → remove it
+                productDocRef.delete().await()
+                false
+            } else {
+                // Not favorite → add it
+                val favItem = FavoriteItem(productId)
+                productDocRef.set(favItem).await()
+                true
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun getFavorites():Result<List<String>>{
+        val uid = auth.currentUser?.uid ?:return Result.Failure("User not logged in")
+        return try {
+            val snapshot = firestore.collection("users")
+                .document(uid)
+                .collection("favorites")
+                .get()
+                .await()
+
+            val favorites = snapshot.documents.mapNotNull { it.id }
+            Result.Success(favorites)
+        } catch (e: Exception) {
+            Result.Failure(e.localizedMessage ?: "Error fetching favorites")
+        }
+
+        }
+
+    override suspend fun isFavorites(productId: String): Boolean {
+        val uid = auth.currentUser?.uid ?:return false
+        return try {
+            val snapshot = firestore.collection("users")
+                .document(uid)
+                .collection("favorites")
+                .document(productId)
+                .get()
+                .await()
+            snapshot.exists()
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+
 }

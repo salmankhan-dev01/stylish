@@ -2,6 +2,7 @@ package com.example.stylish.presentation.products
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -82,8 +83,9 @@ fun ProductDetailScreen(
     val productState by productViewModel.productState.collectAsState()
     val addCartState by productViewModel.addCart.collectAsState()
     val getCartState by productViewModel.getCart.collectAsState()
+    val toggleState by productViewModel.isFavorite.collectAsState()
     var selectedImageIndex by remember { mutableStateOf(0) }
-    var isFavorite by remember { mutableStateOf(false) }
+    val isFavorite by productViewModel.isFavorite.collectAsState(initial = false)
     val context = LocalContext.current
 
 
@@ -94,10 +96,11 @@ fun ProductDetailScreen(
 
         else -> null
     }
-
-    LaunchedEffect(Unit) {
+    LaunchedEffect(productId) {
+        productViewModel.checkFavoriteStatus(productId.toString())
         productViewModel.getToCart()
     }
+
 
     val cartCount = when (val state = getCartState) {
         is Result.Success -> state.data.sumOf { it.quantity }
@@ -120,15 +123,14 @@ fun ProductDetailScreen(
                     Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
                 }
                 IconButton(onClick = {
-                    if(isFavorite){
-
-                    }
-                    isFavorite = !isFavorite
+                    product?.let { productViewModel.toggleFavorite(it.id.toString()) }
 
 
                 }) {
                     Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        imageVector = if (isFavorite) {
+                            Icons.Default.Favorite
+                        } else Icons.Default.FavoriteBorder,
                         contentDescription = "favorite",
                         tint = if (isFavorite) Color.Red else Color.Gray
                     )

@@ -1,5 +1,6 @@
 package com.example.stylish.presentation.products
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,16 +55,19 @@ import java.math.RoundingMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel) {
+fun FavoriteProduct(navController: NavHostController, productViewModel: ProductViewModel) {
     val productState by productViewModel.productState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-
+    val favoriteState by productViewModel.favorites.collectAsState()
+    LaunchedEffect(navController.currentBackStackEntry) {
+        productViewModel.loadFavorites()
+    }
     Scaffold(
         topBar = { Top(navController) },
         bottomBar = {
             BottomBar(
                 navController,
-                Routes.ViewAll
+                Routes.FavoriteProduct
             )
         }
     ) { innerPadding ->
@@ -115,7 +120,7 @@ fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp)
             ) {
-                when (val state = productState) {
+                when (val state = favoriteState) {
                     is Result.Success -> {
                         Text(
                             text = "${state.data.size} Items",
@@ -200,10 +205,46 @@ fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel
                 }
 
                 is Result.Success -> {
-                    AllProducts(state.data.filter {product ->
+
+                    val filteredProducts=state.data.filter {product ->
                         product.title.contains(searchQuery, ignoreCase = true) ||
-                                levenshtein(product.title.lowercase(),searchQuery.lowercase())<=2
-                    }, navController)
+                                levenshtein(product.title.lowercase(),searchQuery.lowercase())<=2 }
+                    when (val s = favoriteState) {
+                        is Result.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                        is Result.Success -> {
+                            val favoriteIds = s.data // List<String> of favorite product IDs
+                            val favoriteProducts = filteredProducts.filter { product ->
+                                favoriteIds.contains(product.id.toString())
+                            }
+
+                            if (favoriteProducts.isEmpty()) {
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    Text("No favorites yet", color = Color.Gray, fontSize = 16.sp)
+                                }
+                            } else {
+                                AllProducts(favoriteProducts, navController)
+                            }
+                        }
+                        is Result.Failure -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(text = "Error: ${s.message}", color = Color.Red)
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    TextButton(onClick = { productViewModel.loadFavorites() }) {
+                                        Text(text = "Retry")
+                                    }
+                                }
+                            }
+                        }
+                        is Result.Idle -> {}
+                    }
+
+
+
                 }
 
                 is Result.Failure -> {
@@ -230,81 +271,3 @@ fun ViewAll(navController: NavHostController, productViewModel: ProductViewModel
     }
 
 }
-
-@Composable
-fun AllProducts(
-    productList: List<Product>,
-    navController: NavHostController,
-) {
-    if (productList.isEmpty()) {
-        // Show "empty state" message
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "No products found",
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-        }
-    }else{
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(productList) { product ->
-            val title = product.title
-            val image = product.thumbnail
-            val description = product.description
-            val rating = product.rating
-            val stock = product.stock
-            val discount = product.discountPercentage
-            val price = product.price
-
-            if (
-                price != null && discount != null && title != null &&
-                image != null && description != null && rating != null && stock != null
-            ) {
-                val originalPrice = BigDecimal(price / (1 - discount / 100))
-                    .setScale(2, RoundingMode.HALF_UP)
-                    .toDouble()
-                ProductCard(
-                    title = title,
-                    image = image,
-                    dis = description,
-                    rating = rating,
-                    price = price,
-                    dprice = originalPrice,
-                    stock = stock.toDouble(),
-                    discount = discount.toString(),
-                    onClick = { navController.navigate(Routes.ProductDetailScreen(product.id)) }
-                )
-            }
-
-
-
-        }
-    }}
-}
-
-
-fun levenshtein(a: String, b: String): Int {
-    val dp = Array(a.length + 1) { IntArray(b.length + 1) }
-
-    for (i in 0..a.length) dp[i][0] = i
-    for (j in 0..b.length) dp[0][j] = j
-
-    for (i in 1..a.length) {
-        for (j in 1..b.length) {
-            dp[i][j] = if (a[i - 1] == b[j - 1]) dp[i - 1][j - 1]
-            else 1 + minOf(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1])
-        }
-    }
-    return dp[a.length][b.length]
-}
-
-

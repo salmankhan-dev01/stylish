@@ -7,7 +7,10 @@ import com.example.stylish.domain.model.CartItem
 import com.example.stylish.domain.model.Product
 import com.example.stylish.domain.usecase.AddToCartUseCase
 import com.example.stylish.domain.usecase.GetCartItemsUseCase
+import com.example.stylish.domain.usecase.GetFavoritesUseCase
 import com.example.stylish.domain.usecase.GetProductsUseCase
+import com.example.stylish.domain.usecase.IsFavorite
+import com.example.stylish.domain.usecase.ToggleFavoriteUseCase
 import com.example.stylish.util.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +20,10 @@ import kotlinx.coroutines.launch
 class ProductViewModel(
     private val getProductsUseCase: GetProductsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
-    private val getToCartUseCase: GetCartItemsUseCase
+    private val getToCartUseCase: GetCartItemsUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val isFavoriteUseCase: IsFavorite
 ) : ViewModel() {
     private val _productsState= MutableStateFlow<Result<List<Product>>>(Result.Idle)
     val productState: StateFlow<Result<List<Product>>> =_productsState.asStateFlow()
@@ -27,6 +33,12 @@ class ProductViewModel(
 
     private val _addCart=MutableStateFlow<Result<String>>(Result.Idle)
     val addCart: StateFlow<Result<String>> =_addCart
+
+    private val _favorites =  MutableStateFlow<Result<List<String>>>(Result.Idle)
+    val favorites: StateFlow<Result<List<String>>> = _favorites
+
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> = _isFavorite
 
     init {
         loadProducts()
@@ -70,6 +82,26 @@ class ProductViewModel(
             }catch (e: Exception){
                 _addCart.value= Result.Failure(e.message?:"Unknown error")
             }
+        }
+    }
+
+    fun loadFavorites() {
+        _favorites.value= Result.Loading
+        viewModelScope.launch {
+           val result=getFavoritesUseCase()
+            _favorites.value=result
+        }
+    }
+
+    fun toggleFavorite(productId: String) {
+        viewModelScope.launch {
+           val res=toggleFavoriteUseCase(productId)
+            _isFavorite.value=res
+        }
+    }
+    fun checkFavoriteStatus(productId: String) {
+        viewModelScope.launch {
+            _isFavorite.value = isFavoriteUseCase(productId)
         }
     }
 

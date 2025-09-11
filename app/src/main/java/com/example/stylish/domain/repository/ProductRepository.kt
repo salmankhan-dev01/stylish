@@ -10,4 +10,9 @@ interface ProductRepository {
     suspend fun addToCart(productId:String,quantity: Int): Result<String>
 
     suspend fun getToCart(): Result<List<CartItem>>
+
+    suspend fun toggleFavorite(productId: String): Boolean
+    suspend fun getFavorites(): Result<List<String>>
+
+    suspend fun isFavorites(productId: String): Boolean
 }

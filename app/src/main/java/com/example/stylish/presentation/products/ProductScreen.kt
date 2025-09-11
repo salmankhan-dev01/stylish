@@ -31,11 +31,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
@@ -65,10 +68,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -512,36 +517,14 @@ fun Top(navController: NavHostController) {
             .fillMaxWidth()
             .height(70.dp)
             .background(color = Color(0xFFF1F1F1))
+            .padding(top = 10.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.height(20.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = null,
-                    modifier = Modifier.size(35.dp),
-                    tint = Color.Black
-                )
-                Spacer(Modifier.width(70.dp))
-                Image(
-                    painter = painterResource(R.drawable.icons),
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp)
-                )
-                Spacer(Modifier.width(70.dp))
-                Image(
-                    painter = painterResource(R.drawable.avdarlogo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clickable {
-                            navController.navigate(Routes.UserProfile)
-                        })
-            }
-        }
+        Image(
+            painter = painterResource(R.drawable.icons),
+            contentDescription = null,
+            modifier = Modifier.size(120.dp)
+        )
     }
 }
 
@@ -577,12 +560,12 @@ fun BottomBar(
         BottomBarItem(
             icon = Icons.Default.FavoriteBorder,
             label = "Wishlist",
-            isSelected = selectedTab == Routes.ViewAll,
+            isSelected = selectedTab == Routes.FavoriteProduct,
             selectedColor = pink,
             unselectedColor = black
         ) {
-            navHostController.navigate(Routes.ViewAll) {
-                popUpTo(Routes.ViewAll) { inclusive = true }
+            navHostController.navigate(Routes.FavoriteProduct) {
+                popUpTo(Routes.FavoriteProduct) { inclusive = true }
                 launchSingleTop = true
             }
         }
@@ -595,18 +578,22 @@ fun BottomBar(
             selectedColor = pink,
             unselectedColor = black
         ) {
-            //navHostController.navigate(Routes.Search)
+            navHostController.navigate(Routes.ViewAll) {
+                popUpTo(Routes.ViewAll) { inclusive = true }
+                launchSingleTop = true
+            }
+
         }
 
         // ---- Setting ----
         BottomBarItem(
-            icon = Icons.Default.Settings,
-            label = "Setting",
+            icon = Icons.Default.PersonOutline,
+            label = "Me",
             isSelected = false,
             selectedColor = pink,
             unselectedColor = black
         ) {
-            // navHostController.navigate(Routes.Setting)
+            navHostController.navigate(Routes.UserProfile)
         }
     }
 }

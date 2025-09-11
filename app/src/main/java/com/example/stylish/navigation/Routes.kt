@@ -40,4 +40,7 @@ sealed class Routes(){
     @Serializable
     data class CategoryProduct(val productCategory: String): Routes()
 
+    @Serializable
+    data object FavoriteProduct: Routes()
+
 }

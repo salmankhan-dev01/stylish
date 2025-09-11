@@ -25,13 +25,16 @@ import com.example.stylish.domain.usecase.AddUserUseCase
 import com.example.stylish.domain.usecase.GetAddressUseCase
 import com.example.stylish.domain.usecase.GetBankAccountUseCase
 import com.example.stylish.domain.usecase.GetCartItemsUseCase
+import com.example.stylish.domain.usecase.GetFavoritesUseCase
 import com.example.stylish.domain.usecase.GetProductsUseCase
 import com.example.stylish.domain.usecase.GetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.GetUserUseCase
+import com.example.stylish.domain.usecase.IsFavorite
 import com.example.stylish.domain.usecase.LoginUseCase
 import com.example.stylish.domain.usecase.LogoutUseCase
 import com.example.stylish.domain.usecase.SetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.SignUpUseCase
+import com.example.stylish.domain.usecase.ToggleFavoriteUseCase
 import com.example.stylish.presentation.userPreference.UserPreferencesViewModel
 import com.example.stylish.presentation.auth.ForgotScreen
 import com.example.stylish.presentation.auth.LoginScreen
@@ -48,6 +51,7 @@ import com.example.stylish.presentation.splash.SplashScreen
 import com.example.stylish.presentation.auth.AuthViewModel
 import com.example.stylish.presentation.auth.AuthViewModelFactory
 import com.example.stylish.presentation.products.CategoryProduct
+import com.example.stylish.presentation.products.FavoriteProduct
 import com.example.stylish.presentation.products.PaymentScreen
 import com.example.stylish.presentation.products.PlaceOrderScreen
 import com.example.stylish.presentation.profile.AddressAccountViewModel
@@ -68,7 +72,10 @@ fun Navigation(){
     val getProductsUseCase=remember { GetProductsUseCase(productPepo) }
     val addToCartUseCase=remember { AddToCartUseCase(productPepo) }
     val getToCartUseCase=remember { GetCartItemsUseCase(productPepo) }
-    val productViewModel=remember { ProductViewModel(getProductsUseCase,addToCartUseCase,getToCartUseCase) }
+    val getFavoritesUseCase=remember { GetFavoritesUseCase(productPepo) }
+    val toggleFavoriteUseCase=remember { ToggleFavoriteUseCase(productPepo) }
+    val isFavoriteUserCase=remember { IsFavorite(productPepo) }
+    val productViewModel=remember { ProductViewModel(getProductsUseCase,addToCartUseCase,getToCartUseCase,getFavoritesUseCase,toggleFavoriteUseCase,isFavoriteUserCase) }
 
     // for user preferences
     val userPreferencesDataStore=remember { UserPreferencesDataStore(context) }
@@ -120,7 +127,7 @@ fun Navigation(){
     // Get ViewModel with factory
     val viewModel: AuthViewModel = viewModel(factory = factory)
 
-    NavHost(navController=navController, startDestination = Routes.ProductScreen){
+    NavHost(navController=navController, startDestination = Routes.LoginScreen){
         //NAV GRAPH
         composable<Routes.SplashScreen> {
             SplashScreen()
@@ -170,6 +177,9 @@ fun Navigation(){
             val args=backStackEntry.toRoute<Routes.CategoryProduct>()
             val categoryList = args.productCategory.split(",")
             CategoryProduct(navController,productViewModel,categoryList)
+        }
+        composable<Routes.FavoriteProduct> {
+            FavoriteProduct(navController,productViewModel)
         }
     }
 //    LaunchedEffect(userPreferenceState.isLoading,userPreferenceState.isLoggedIn,userPreferenceState.isFirstTimeLogin) {

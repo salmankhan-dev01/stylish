@@ -42,5 +42,7 @@ sealed class Routes(){
 
     @Serializable
     data object FavoriteProduct: Routes()
+    @Serializable
+    data object OrderScreen: Routes()
 
 }

@@ -16,6 +16,7 @@ import com.example.stylish.data.remote.FirebaseService
 import com.example.stylish.data.remote.NetworkModule
 import com.example.stylish.data.repository.AddressAccountRepositoryImpl
 import com.example.stylish.data.repository.AuthRepositoryImpl
+import com.example.stylish.data.repository.OrderProductImpl
 import com.example.stylish.data.repository.ProductRepositoryImpl
 import com.example.stylish.data.repository.UserPreferencesRepositoryImpl
 import com.example.stylish.domain.usecase.AddAddressUseCase
@@ -32,6 +33,8 @@ import com.example.stylish.domain.usecase.GetUserUseCase
 import com.example.stylish.domain.usecase.IsFavorite
 import com.example.stylish.domain.usecase.LoginUseCase
 import com.example.stylish.domain.usecase.LogoutUseCase
+import com.example.stylish.domain.usecase.OrderAddUseCase
+import com.example.stylish.domain.usecase.OrderGetUseCase
 import com.example.stylish.domain.usecase.SetUserPreferencesUseCase
 import com.example.stylish.domain.usecase.SignUpUseCase
 import com.example.stylish.domain.usecase.ToggleFavoriteUseCase
@@ -50,6 +53,8 @@ import com.example.stylish.presentation.products.ViewAll
 import com.example.stylish.presentation.splash.SplashScreen
 import com.example.stylish.presentation.auth.AuthViewModel
 import com.example.stylish.presentation.auth.AuthViewModelFactory
+import com.example.stylish.presentation.order.OrderScreen
+import com.example.stylish.presentation.order.OrderScreenViewModel
 import com.example.stylish.presentation.products.CategoryProduct
 import com.example.stylish.presentation.products.FavoriteProduct
 import com.example.stylish.presentation.products.PaymentScreen
@@ -66,6 +71,11 @@ fun Navigation(){
     val context= LocalContext.current
 
 
+    // For adding order from cart
+    val orderRepo=remember { OrderProductImpl(auth = FirebaseAuth.getInstance(), firestore = FirebaseFirestore.getInstance()) }
+    val orderAddUseCase=remember { OrderAddUseCase(orderRepo) }
+    val orderGetUseCase=remember { OrderGetUseCase(orderRepo) }
+    val orderScreenViewModel=remember { OrderScreenViewModel(orderAddUseCase,orderGetUseCase) }
 
     //for fetch product form api
     val productPepo= remember{ ProductRepositoryImpl(NetworkModule.productApiService, firestore = FirebaseFirestore.getInstance(), auth = FirebaseAuth.getInstance()) }
@@ -127,7 +137,7 @@ fun Navigation(){
     // Get ViewModel with factory
     val viewModel: AuthViewModel = viewModel(factory = factory)
 
-    NavHost(navController=navController, startDestination = Routes.LoginScreen){
+    NavHost(navController=navController, startDestination = Routes.UserProfile){
         //NAV GRAPH
         composable<Routes.SplashScreen> {
             SplashScreen()
@@ -171,7 +181,7 @@ fun Navigation(){
         }
         composable <Routes.PaymentScreen>{backStackEntry->
             val args=backStackEntry.toRoute<Routes.PaymentScreen>()
-            PaymentScreen(navController,args.totalPrice)
+            PaymentScreen(navController,args.totalPrice,orderScreenViewModel)
         }
         composable <Routes.CategoryProduct>{backStackEntry->
             val args=backStackEntry.toRoute<Routes.CategoryProduct>()
@@ -180,6 +190,9 @@ fun Navigation(){
         }
         composable<Routes.FavoriteProduct> {
             FavoriteProduct(navController,productViewModel)
+        }
+        composable <Routes.OrderScreen>{
+            OrderScreen(navController,productViewModel,orderScreenViewModel)
         }
     }
 //    LaunchedEffect(userPreferenceState.isLoading,userPreferenceState.isLoggedIn,userPreferenceState.isFirstTimeLogin) {

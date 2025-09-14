@@ -12,12 +12,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Carpenter
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -84,6 +89,11 @@ fun UserProfile(
         viewModel.fetchUser()
     }
 
+    LaunchedEffect(saveUser) {
+        if(saveUser is Result.Success){
+            savedUser=savedUser.copy(name = editableName)
+        }
+    }
 
     // ---------------- Update UI when data arrives ----------------
     LaunchedEffect(addressResult) {
@@ -167,9 +177,10 @@ fun UserProfile(
                     painterResource(id = R.drawable.profile),
                     contentDescription = null,
                     modifier = Modifier
-                        .height(120.dp)
-                        .width(120.dp)
+                        .size(120.dp)
+                        .clip(shape = CircleShape)
                 )
+                //Icon(imageVector = Icons.Default.CameraAlt, contentDescription = null)
             }
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -200,7 +211,9 @@ fun UserProfile(
                 color = Color.Black
             )
             Spacer(modifier = Modifier.height(10.dp))
-            Row() {
+            Row(modifier = Modifier.fillMaxWidth().height(60.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween) {
                 OutlinedTextField(
                     value = editableName,   // yaha aap apna state use karoge
                     modifier = Modifier
@@ -209,7 +222,9 @@ fun UserProfile(
                     onValueChange = { editableName=it },
                     singleLine = true
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                if(saveUser is Result.Loading){
+                    CircularProgressIndicator(color = Pink, modifier = Modifier.size(25.dp))
+                }
                 Button(
                     onClick = {
                         val updatedUser = savedUser.copy(name = editableName)
@@ -437,11 +452,27 @@ fun UserProfile(
             }
             Spacer(modifier = Modifier.height(30.dp))
             Button(
+                onClick = { navController.navigate(Routes.OrderScreen)
+                          },
+                modifier = Modifier
+                    .height(56.dp)
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    disabledContentColor = Color.Gray
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(text = "My Orders")
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+            Button(
                 onClick = { viewModel.logoutAccout() },
                 modifier = Modifier
                     .height(56.dp)
                     .fillMaxWidth(),         // fixed width button
                 colors = ButtonDefaults.buttonColors(
+                    containerColor = Pink,
                     disabledContentColor = Color.Gray
                 ),
                 shape = RoundedCornerShape(12.dp)

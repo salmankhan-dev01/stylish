@@ -1,5 +1,6 @@
 package com.example.stylish.presentation.products
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,16 +33,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -57,6 +59,7 @@ import com.example.stylish.navigation.Routes
 import com.example.stylish.presentation.profile.AddressAccountViewModel
 import com.example.stylish.util.Result
 import com.example.stylish.ui.theme.Pink
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceOrderScreen(
@@ -208,16 +211,50 @@ fun PlaceOrderScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
                 item {
-                    if (filteredProducts.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(400.dp), contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "Product cart is empty", fontSize = 30.sp)
+                    when (getCartState) {
+                        is Result.Loading -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(400.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                androidx.compose.material3.CircularProgressIndicator(color = Pink)
+                            }
                         }
+
+                        is Result.Failure -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(400.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Failed to load cart",
+                                    color = Color.Red,
+                                    fontSize = 18.sp
+                                )
+                            }
+                        }
+
+                        is Result.Success -> {
+                            if (filteredProducts.isEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(400.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = "Product cart is empty", fontSize = 20.sp)
+                                }
+                            }
+                        }
+
+                        else -> {}
                     }
                 }
+
                 items(filteredProducts, key = { it.id }) { product ->
                     val cartCount by remember(product.id, getCartState) {
                         derivedStateOf {
@@ -240,7 +277,7 @@ fun PlaceOrderScreen(
                 }
                 if (filteredProducts.size > 0) {
                     item {
-                        PaymentSection(finalAmount, count,navController)
+                        PaymentSection(finalAmount, count, navController, address)
                     }
                 }
             }
@@ -250,7 +287,13 @@ fun PlaceOrderScreen(
 }
 
 @Composable
-fun PaymentSection(totalPrice: Double, totalItems: Int, navController: NavHostController) {
+fun PaymentSection(
+    totalPrice: Double,
+    totalItems: Int,
+    navController: NavHostController,
+    address: MutableState<String>,
+) {
+    val context= LocalContext.current
     Spacer(modifier = Modifier.height(20.dp))
     Text(
         text = "Order Payment Details",
@@ -265,7 +308,7 @@ fun PaymentSection(totalPrice: Double, totalItems: Int, navController: NavHostCo
     ) {
         Text(text = "Order Amounts", fontSize = 18.sp)
         Text(
-            text = "₹ ${String.format("%.2f",totalPrice)}",
+            text = "₹ ${String.format("%.2f", totalPrice)}",
             fontSize = 18.sp,
             color = Color.Black,
             fontWeight = FontWeight.Bold
@@ -314,7 +357,7 @@ fun PaymentSection(totalPrice: Double, totalItems: Int, navController: NavHostCo
             fontWeight = FontWeight.Medium
         )
         Text(
-            text = "₹ ${String.format("%.2f",totalPrice)}",
+            text = "₹ ${String.format("%.2f", totalPrice)}",
             fontSize = 20.sp,
             color = Color.Black,
             fontWeight = FontWeight.Bold
@@ -324,12 +367,14 @@ fun PaymentSection(totalPrice: Double, totalItems: Int, navController: NavHostCo
     HorizontalDivider()
     Spacer(modifier = Modifier.height(30.dp))
     Row(
-        modifier = Modifier.fillMaxWidth().height(110.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(110.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "₹ ${String.format("%.2f",totalPrice)}",
+            text = "₹ ${String.format("%.2f", totalPrice)}",
             fontSize = 30.sp,
             color = Color.Black,
             fontWeight = FontWeight.Bold
@@ -337,14 +382,22 @@ fun PaymentSection(totalPrice: Double, totalItems: Int, navController: NavHostCo
 
         Button(
             onClick = {
-                navController.navigate(Routes.PaymentScreen(totalPrice)
-                )},
-            modifier = Modifier.width(220.dp).height(56.dp),
+                if (address.value.isNotBlank()) {
+                    navController.navigate(Routes.PaymentScreen(totalPrice))
+                }else{
+                    Toast.makeText(context,"Please fill address first", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier
+                .width(220.dp)
+                .height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Pink),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = "Proceed to Payment", fontSize = 18.sp,
-                fontWeight = FontWeight.Bold)
+            Text(
+                text = "Proceed to Payment", fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
 
     }

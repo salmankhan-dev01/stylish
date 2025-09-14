@@ -88,7 +88,6 @@ class FirebaseService(
             name =user.name,
             email = user.email
         )
-        Log.d("uidnumber",uid+" from login")
         db.collection("users").document(uid)
             .collection("user_details").document("primary")
             .set(dto).await()

@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Carpenter
@@ -58,19 +59,35 @@ import com.example.stylish.ui.theme.Pink
 @Composable
 fun UserProfile(
     viewModel: AddressAccountViewModel,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val scrollState = rememberScrollState()
 
-    var addressModel by remember { mutableStateOf(AddressEntity(pinCode = "", address = "", city = "", state = "", country = "")) }
+    var addressModel by remember {
+        mutableStateOf(
+            AddressEntity(
+                pinCode = "",
+                address = "",
+                city = "",
+                state = "",
+                country = ""
+            )
+        )
+    }
 
     // ---------------- Bank State ----------------
-    var bankModel by remember { mutableStateOf(BankAccountEntity(accountNumber = "", accountHolder = "", ifscCode = "")) }
+    var bankModel by remember {
+        mutableStateOf(
+            BankAccountEntity(
+                accountNumber = "",
+                accountHolder = "",
+                ifscCode = ""
+            )
+        )
+    }
     // User state
     var savedUser by remember { mutableStateOf(UserEntity(name = "", email = "")) }
-    var editableName by  remember { mutableStateOf(savedUser.name )}
-
-
+    var editableName by remember { mutableStateOf(savedUser.name) }
 
 
     // ---------------- Observe ViewModel ----------------
@@ -90,8 +107,8 @@ fun UserProfile(
     }
 
     LaunchedEffect(saveUser) {
-        if(saveUser is Result.Success){
-            savedUser=savedUser.copy(name = editableName)
+        if (saveUser is Result.Success) {
+            savedUser = savedUser.copy(name = editableName)
         }
     }
 
@@ -110,8 +127,8 @@ fun UserProfile(
 
     LaunchedEffect(userResult) {
         if (userResult is Result.Success) {
-            savedUser=(userResult as Result.Success<UserEntity>).data
-            editableName=savedUser.name
+            savedUser = (userResult as Result.Success<UserEntity>).data
+            editableName = savedUser.name
         }
     }
 
@@ -123,14 +140,16 @@ fun UserProfile(
 //                navController.navigate("login_screen") {
 //                    popUpTo("user_profile") { inclusive = true } // previous backstack clear
 //                }
-                navController.navigate(Routes.LoginScreen){
-                    popUpTo(navController.graph.id){
-                        inclusive=true
+                navController.navigate(Routes.LoginScreen) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
                     }
                 }
             }
+
             is Result.Failure -> {
             }
+
             else -> {}
         }
     }
@@ -143,7 +162,10 @@ fun UserProfile(
             verticalArrangement = Arrangement.Center,
         ) {
             IconButton(onClick = {}) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.clickable{navController.popBackStack()})
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    modifier = Modifier.clickable { navController.popBackStack() })
             }
         }
     }
@@ -167,20 +189,30 @@ fun UserProfile(
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painterResource(id = R.drawable.profile),
-                    contentDescription = null,
+            Box(modifier = Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center){
+                Box(
                     modifier = Modifier
                         .size(120.dp)
-                        .clip(shape = CircleShape)
-                )
-                //Icon(imageVector = Icons.Default.CameraAlt, contentDescription = null)
+                ) {
+                    Image(
+                        painterResource(id = R.drawable.profile),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(shape = CircleShape)
+                    )
+                    Icon(
+                        painterResource(id=R.drawable.addprofile),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(top = 90.dp, start = 90.dp)
+                            .size(30.dp).clickable{
+                                
+                            },
+                        tint = Color.Black
+
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -211,18 +243,22 @@ fun UserProfile(
                 color = Color.Black
             )
             Spacer(modifier = Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth().height(60.dp),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 OutlinedTextField(
                     value = editableName,   // yaha aap apna state use karoge
                     modifier = Modifier
                         .width(200.dp)
                         .height(56.dp),
-                    onValueChange = { editableName=it },
+                    onValueChange = { editableName = it },
                     singleLine = true
                 )
-                if(saveUser is Result.Loading){
+                if (saveUser is Result.Loading) {
                     CircularProgressIndicator(color = Pink, modifier = Modifier.size(25.dp))
                 }
                 Button(
@@ -250,7 +286,7 @@ fun UserProfile(
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
-                value =savedUser.email,
+                value = savedUser.email,
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth(),
                 enabled = false,   // Disabled field
@@ -275,7 +311,11 @@ fun UserProfile(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Text(text = "Change Password", color = Pink, textDecoration = TextDecoration.Underline)
+                Text(
+                    text = "Change Password",
+                    color = Pink,
+                    textDecoration = TextDecoration.Underline
+                )
             }
             Spacer(modifier = Modifier.height(15.dp))
             HorizontalDivider()
@@ -296,7 +336,7 @@ fun UserProfile(
 
             OutlinedTextField(
                 value = addressModel.pinCode,
-                onValueChange = {addressModel = addressModel.copy(pinCode = it) },
+                onValueChange = { addressModel = addressModel.copy(pinCode = it) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -371,10 +411,11 @@ fun UserProfile(
                 is Result.Loading -> Text("Saving address...")
                 is Result.Success -> Text((saveAddressResult as Result.Success<String>).data)
                 is Result.Failure -> {
-                    val txt="${(saveAddressResult as Result.Failure).message}"
-                    Log.d("address1",txt)
+                    val txt = "${(saveAddressResult as Result.Failure).message}"
+                    Log.d("address1", txt)
                     Text("Error: ${(saveAddressResult as Result.Failure).message}")
                 }
+
                 else -> {}
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -452,8 +493,9 @@ fun UserProfile(
             }
             Spacer(modifier = Modifier.height(30.dp))
             Button(
-                onClick = { navController.navigate(Routes.OrderScreen)
-                          },
+                onClick = {
+                    navController.navigate(Routes.OrderScreen)
+                },
                 modifier = Modifier
                     .height(56.dp)
                     .fillMaxWidth(),

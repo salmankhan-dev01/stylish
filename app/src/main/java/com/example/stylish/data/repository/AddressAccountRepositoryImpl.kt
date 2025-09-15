@@ -81,7 +81,7 @@ class AddressAccountRepositoryImpl(
 
     override suspend fun addUser(user: UserEntity): Result<String> {
         return try {
-            firebaseService.saveUser(user)
+            firebaseService.saveUser(user.copy(image = null))
             userDao.insert(user)
             Result.Success("User added successfully")
         }catch (e: Exception){
@@ -94,14 +94,13 @@ class AddressAccountRepositoryImpl(
         return try {
             val local=userDao.getLatestUser()
             if(local!=null) return Result.Success(local)
-            Log.d("uidname","fetching in firebase")
             val remote=firebaseService.getUser()
-            Log.d("uidname","fetched in firebase")
-            if (remote!=null){
 
-                userDao.insert(remote)
-                Log.d("uidname","data added in table")
-                Result.Success(remote)
+            if (remote!=null){
+                userDao.insert(remote.copy(image = null))
+
+                Result.Success(remote.copy(image = null))
+
             }else{
                 Result.Failure("No user found")
             }

@@ -1,6 +1,15 @@
 package com.example.stylish.presentation.profile
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import com.example.stylish.util.Result
@@ -43,6 +52,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -55,6 +66,9 @@ import com.example.stylish.data.local.entity.BankAccountEntity
 import com.example.stylish.data.local.entity.UserEntity
 import com.example.stylish.navigation.Routes
 import com.example.stylish.ui.theme.Pink
+import com.google.firebase.auth.FirebaseAuth
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 @Composable
 fun UserProfile(
@@ -62,32 +76,19 @@ fun UserProfile(
     navController: NavHostController,
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
-    var addressModel by remember {
-        mutableStateOf(
-            AddressEntity(
-                pinCode = "",
-                address = "",
-                city = "",
-                state = "",
-                country = ""
-            )
-        )
-    }
+
+    var addressModel by remember { mutableStateOf(AddressEntity(pinCode = "", address = "", city = "", state = "", country = "")) }
 
     // ---------------- Bank State ----------------
     var bankModel by remember {
-        mutableStateOf(
-            BankAccountEntity(
-                accountNumber = "",
-                accountHolder = "",
-                ifscCode = ""
-            )
-        )
-    }
+        mutableStateOf(BankAccountEntity(accountNumber = "", accountHolder = "", ifscCode = "")) }
     // User state
     var savedUser by remember { mutableStateOf(UserEntity(name = "", email = "")) }
     var editableName by remember { mutableStateOf(savedUser.name) }
+    var selectedImage by remember { mutableStateOf<ByteArray?>(null) }
+
 
 
     // ---------------- Observe ViewModel ----------------
@@ -98,6 +99,40 @@ fun UserProfile(
     val logoutState by viewModel.logout.collectAsState()
     val userResult by viewModel.userResult.collectAsState()
     val saveUser by viewModel.saveUserResult.collectAsState()
+
+    // ---------------- Gallery Launcher ----------------
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val bitmap: Bitmap = if (Build.VERSION.SDK_INT < 28) {
+                BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+            } else {
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            }
+
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 512, 512, true)
+            val path = saveBitmapToInternalStorage(context, scaledBitmap, "profile_${System.currentTimeMillis()}.jpg")
+
+            savedUser = savedUser.copy(image = path)
+
+            // Save file path to Room
+            val updatedUser = savedUser.copy(image = path)
+            viewModel.saveUser(updatedUser)
+        }
+    }
+
+
+    val displayBitmap = remember(savedUser) {
+        val path = savedUser.image
+        if (!path.isNullOrEmpty() && File(path).exists()) {
+            BitmapFactory.decodeFile(path)
+        } else {
+            BitmapFactory.decodeResource(context.resources, R.drawable.profile)
+        }
+    }
+
 
     // ---------------- Fetch on screen open ----------------
     LaunchedEffect(Unit) {
@@ -154,6 +189,7 @@ fun UserProfile(
         }
     }
 
+
     Scaffold(topBar = {
         Column(
             modifier = Modifier
@@ -188,6 +224,9 @@ fun UserProfile(
                     fontWeight = FontWeight.Bold
                 )
             }
+//            val auth= FirebaseAuth.getInstance()
+//            val uid=auth.currentUser?.uid?:"No uid"
+//            Toast.makeText(context,uid, Toast.LENGTH_SHORT).show()
             Spacer(modifier = Modifier.height(10.dp))
             Box(modifier = Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center){
                 Box(
@@ -195,7 +234,7 @@ fun UserProfile(
                         .size(120.dp)
                 ) {
                     Image(
-                        painterResource(id = R.drawable.profile),
+                        bitmap=displayBitmap.asImageBitmap(),
                         contentDescription = null,
                         modifier = Modifier
                             .size(120.dp)
@@ -207,7 +246,7 @@ fun UserProfile(
                         modifier = Modifier
                             .padding(top = 90.dp, start = 90.dp)
                             .size(30.dp).clickable{
-                                
+                                launcher.launch("image/*")
                             },
                         tint = Color.Black
 
@@ -509,7 +548,7 @@ fun UserProfile(
 
             Spacer(modifier = Modifier.height(30.dp))
             Button(
-                onClick = { viewModel.logoutAccout() },
+                onClick = { viewModel.logoutAccount() },
                 modifier = Modifier
                     .height(56.dp)
                     .fillMaxWidth(),         // fixed width button
@@ -528,3 +567,10 @@ fun UserProfile(
     }
 }
 
+fun saveBitmapToInternalStorage(context: Context, bitmap: Bitmap, filename: String): String {
+    val file = File(context.filesDir, filename)
+    file.outputStream().use { out ->
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
+    }
+    return file.absolutePath
+}

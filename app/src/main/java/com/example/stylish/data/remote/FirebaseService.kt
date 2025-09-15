@@ -99,10 +99,12 @@ class FirebaseService(
                 .collection("user_details").document("primary")
                 .get().await()
             val dto=doc.toObject(UserDto::class.java)?: return  null
+
             UserEntity(
                 id = 0,
                 name = dto.name,
                 email = dto.email,
+                image = null
 
             )
         }catch (e: Exception){

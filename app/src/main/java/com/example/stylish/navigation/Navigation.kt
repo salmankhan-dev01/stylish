@@ -130,14 +130,14 @@ fun Navigation(){
 
 
     //For login and signup
-    val authRepository = AuthRepositoryImpl(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(),firebaseService,userDao)
+    val authRepository = AuthRepositoryImpl(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(),firebaseService,userDao,addressDao,bankAccountDao)
     val loginUseCase = LoginUseCase(authRepository)
     val signUpUseCase = SignUpUseCase(authRepository)
     val factory = AuthViewModelFactory(loginUseCase, signUpUseCase)
     // Get ViewModel with factory
     val viewModel: AuthViewModel = viewModel(factory = factory)
 
-    NavHost(navController=navController, startDestination = Routes.UserProfile){
+    NavHost(navController=navController, startDestination = Routes.SplashScreen){
         //NAV GRAPH
         composable<Routes.SplashScreen> {
             SplashScreen()

@@ -22,7 +22,6 @@ import com.example.stylish.R
 
 @Composable
 fun SplashScreen() {
-    val dropAnim = remember { Animatable(-300f) }
 
     // Launch animation when composable is composed
 //    LaunchedEffect(Unit) {

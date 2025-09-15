@@ -97,7 +97,7 @@ class AddressAccountViewModel(
         _userResult.value = Result.Loading
         _userResult.value =getUserUseCase()
     }
-    fun logoutAccout(){
+    fun logoutAccount(){
         viewModelScope.launch {
             _logoutUser.value= Result.Loading
             _logoutUser.value= logoutUseCase()
